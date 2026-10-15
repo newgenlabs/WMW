@@ -122,7 +122,7 @@ const VALID = {
   qName: v => v.trim().length >= 2 || "Please enter your name",
   qPhone: v => v.replace(/\D/g, "").length >= 7 || "Enter a valid phone number",
   qEmail: v => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v) || "Enter a valid email",
-  qZip: v => v.trim().length >= 3 || "Enter your ZIP / postcode"
+  qZip: v => v.trim().length >= 3 || "Enter your ZIP or postcode"
 };
 function quoteForm() {
   const form = $("#quoteForm");
