@@ -290,46 +290,70 @@ function beforeAfter() {
 
 /* ---------- gallery ---------- */
 const PROJECTS = [
-  { t: "Herringbone entry hall", cat: "Floors", stone: "carrara", pattern: "herringbone", finish: "honed", size: 12, desc: "Honed Carrara in a 90° herringbone with light grout, 140 sq ft." },
-  { t: "Checkerboard kitchen", cat: "Floors", stone: "calacatta", pattern: "checker", finish: "polished", size: 16, desc: "Polished Calacatta and Nero Marquina checker, laid straight." },
-  { t: "Walk-in marble shower", cat: "Showers", stone: "carrara", pattern: "brick", finish: "honed", size: 12, desc: "Waterproofed and sloped, with a mosaic pan and niche." },
-  { t: "Travertine terrace", cat: "Outdoor", stone: "travertine", pattern: "straight", finish: "tumbled", size: 16, desc: "Tumbled travertine, slip-resistant, sealed against frost." },
-  { t: "Emperador powder room", cat: "Bathrooms", stone: "emperador", pattern: "diagonal", finish: "polished", size: 12, desc: "Diagonal layout makes a small room feel larger." },
-  { t: "Green marble fireplace", cat: "Feature walls", stone: "verde", pattern: "straight", finish: "polished", size: 24, desc: "Book-matched Verde Alpi surround with mitred corners." },
-  { t: "Black &amp; white foyer", cat: "Floors", stone: "nero", pattern: "checker", finish: "polished", size: 12, desc: "High-contrast checker with charcoal grout." },
-  { t: "Spa bathroom walls", cat: "Bathrooms", stone: "calacatta", pattern: "straight", finish: "honed", size: 24, desc: "Large-format honed Calacatta, floor to ceiling." }
+  { n: 1, t: "Sculpted curved lobby counter", cat: "Commercial", cats: ["Commercial", "Countertops"], stone: "White quartz, soft grey veining", layout: "Single sweeping curve, thick rounded edge, matched veining along the run", finish: "Polished", where: "Building lobby / amenity space",
+    desc: "A long, flowing reception counter fabricated in a bright quartz with a soft grey vein that runs the length of the top. The rounded ends and curved edge profile were templated to the cabinet base, set over a terrazzo floor." },
+  { n: 2, t: "Large-slab shower with niche & bench", cat: "Showers & Baths", cats: ["Showers & Baths", "Residential"], stone: "Grey-and-cream marble slabs, dramatic linear veining", layout: "Full-height slabs on walls and ceiling, mitred corners, recessed niche, slab bench", finish: "Polished", where: "Residential bathroom (in progress)",
+    desc: "Shower surround in oversized marble slabs with the veining carried continuously from wall to wall. Includes a recessed shelf niche in a contrasting darker cut and a solid-slab bench with a mitred nosing." },
+  { n: 3, t: "L-shaped concrete-look counter", cat: "Commercial", cats: ["Commercial", "Countertops"], stone: "Grey concrete-look solid surface / terrazzo-aggregate edge", layout: "Two-run L layout with tight butt seam, overhang on dark cabinetry", finish: "Honed", where: "Commercial lounge / pantry",
+    desc: "A large-format L-shaped service counter in a muted grey with a visible aggregate edge, installed over dark cabinetry. The seam is flush and the overhang supported for seating." },
+  { n: 4, t: "Arabescato marble reception ledge", cat: "Feature walls", cats: ["Feature walls", "Commercial"], stone: "White marble with bold grey veining (Arabescato-style)", layout: "Solid thick marble ledge, book-matched veining, set on black reception desk", finish: "Polished", where: "Building lobby",
+    desc: "A solid marble transaction ledge with high-contrast grey veining, seated on a black reception desk. A statement piece against the dark millwork and glass curtain wall." },
+  { n: 5, t: "Curved bar top with green tile wall", cat: "Commercial", cats: ["Commercial", "Countertops"], stone: "Light quartz top; green glazed ceramic wall tile", layout: "Curved bar top with integrated power; 4×4 wall tile in straight stack with white grout", finish: "Polished top / glazed wall", where: "Commercial lounge",
+    desc: "A curved bar-height counter with cut-outs for power, finished with a clean polished edge. Behind it, deep green glazed square tile is set in a straight stack with contrasting white grout lines." },
+  { n: 6, t: "Marble slab shower with chevron floor", cat: "Showers & Baths", cats: ["Showers & Baths", "Residential"], stone: "Grey marble slabs; white marble chevron mosaic floor", layout: "Book-matched full-height wall slabs, chevron mosaic pan, linear drain, marble vanity top & bench", finish: "Polished walls, honed mosaic", where: "Residential primary bath",
+    desc: "Floor-to-ceiling marble slabs with sweeping diagonal veining, a slab bench, recessed niche and concealed LED cove. The shower floor is a white marble chevron mosaic pitched to a linear drain." },
+  { n: 7, t: "Kitchenette with full-height splash", cat: "Kitchens", cats: ["Kitchens", "Commercial"], stone: "Warm grey quartz", layout: "Straight run top with undermount sink; full-height matching backsplash", finish: "Polished", where: "Office pantry",
+    desc: "A tidy office pantry: warm grey quartz counter with undermount sink cut-out and a full-height slab backsplash that eliminates grout lines behind the work area." },
+  { n: 8, t: "Waterfall island & slab splash", cat: "Kitchens", cats: ["Kitchens", "Residential"], stone: "White quartz, fine grey veining (Carrara-look)", layout: "Waterfall island with mitred legs; slab backsplash inside a walnut niche", finish: "Polished", where: "Loft kitchen",
+    desc: "A waterfall island with mitred, vein-matched side panels and a single slab backsplash framed by walnut. Clean lines against exposed brick and wide-plank oak." },
+  { n: 9, t: "Marble tub deck with slotted wall", cat: "Showers & Baths", cats: ["Showers & Baths", "Feature walls", "Residential"], stone: "White marble with grey veining (Statuario-style)", layout: "Book-matched wall slabs with routed vertical slots, fluted tub apron, undermount tub deck", finish: "Polished and honed flutes", where: "Residential spa bath",
+    desc: "A custom bath: full slab walls with precision-routed vertical slots, a fluted marble apron below the deck, and an undermount tub set into a solid marble surround with the veining continuing across the deck." },
+  { n: 10, t: "Calacatta waterfall island & slab splash", cat: "Kitchens", cats: ["Kitchens", "Residential"], stone: "Calacatta-style marble, gold-grey veining", layout: "Mitred waterfall island, stepped overhang, full-height slab backsplash, herringbone-chevron wood floor", finish: "Polished", where: "Loft kitchen (during install)",
+    desc: "Shown mid-install with protective tape: a large mitred island wrapped in matching marble, a stepped overhang and a full-height backsplash cut from consecutive slabs so the veins continue." },
+  { n: 11, t: "Sanctuary steps & borders", cat: "Floors", cats: ["Floors", "Commercial"], stone: "Dark Emperador marble with cream marble inlay bands", layout: "Stepped platform, mitred corners, cream inlay stripes, matching risers", finish: "Polished", where: "Church sanctuary",
+    desc: "A multi-level sanctuary platform finished in dark brown Emperador with crisp cream inlay bands that follow every angle change. Treads, risers and borders are mitred and aligned to the altar." },
+  { n: 12, t: "Radial-line hex floor tile", cat: "Floors", cats: ["Floors", "Residential"], stone: "Glossy white porcelain/ceramic, black line pattern", layout: "Elongated hexagon tiles forming starburst pattern, dark grout", finish: "Glossy", where: "Small residential bathroom",
+    desc: "A graphic pattern floor: elongated hexagon tiles whose black radiating lines join into starbursts. Careful layout from the centre line keeps each burst aligned and the cuts at the walls balanced." },
+  { n: 13, t: "Elevator lobby relief tile walls", cat: "Feature walls", cats: ["Feature walls", "Commercial"], stone: "Handmade-look glazed ceramic in green-grey tones", layout: "Raised relief bar tile in interlocking basket/herringbone pattern, brick-bond returns at corners", finish: "Glazed", where: "Commercial elevator lobby",
+    desc: "A textured feature wall of narrow glazed bars set in a woven, stepped pattern with varied glaze tones. Corners return in a stacked brick bond for clean wrap-arounds." },
+  { n: 14, t: "Residential kitchen with herringbone splash", cat: "Kitchens", cats: ["Kitchens", "Residential"], stone: "White quartz with bold grey veining; grey herringbone mosaic splash; large white floor tile", layout: "Large island with seamed overhang, herringbone mosaic backsplash, straight-lay large-format floor", finish: "Polished", where: "Home kitchen",
+    desc: "White quartz perimeter and island with dramatic grey veins, a narrow-stick herringbone mosaic backsplash, and a large-format porcelain floor laid straight." },
+  { n: 15, t: "Butler's pantry with plank floor", cat: "Kitchens", cats: ["Kitchens", "Residential"], stone: "White quartz, grey swoosh veining; wood-look porcelain plank floor", layout: "Counter with mitred corner detail; planks in a staggered running bond", finish: "Polished / matte plank", where: "Home pantry",
+    desc: "A white quartz counter with a flowing grey vein carried across the corner. The floor is wood-look porcelain plank laid in a staggered pattern with narrow joints." },
+  { n: 16, t: "Calacatta marble waterfall island", cat: "Kitchens", cats: ["Kitchens", "Residential"], stone: "Calacatta-style white marble, grey veining", layout: "Island with mitred waterfall end, stepped ledge around column, vein-matched side panels", finish: "Polished", where: "Loft kitchen",
+    desc: "A close look at a marble island wrapping a structural column: stepped ledge, continuous veining down the waterfall panel, and tight mitred joints. Taped sink opening is protected for the next trade." }
 ];
+const pimg = (p, thumb) => `images/project-${String(p.n).padStart(2, "0")}${thumb ? "-thumb" : ""}.jpg`;
 function gallery() {
-  const cats = ["All", ...new Set(PROJECTS.map(p => p.cat))];
-  let cur = "All";
+  const cats = ["All", ...new Set(PROJECTS.flatMap(p => p.cats))];
+  let cur = "All", idx = 0, shown = [];
   const fl = $("#galFilters"), g = $("#gallery");
   const show = () => {
     fl.innerHTML = cats.map(c => `<button type="button" aria-pressed="${c === cur}">${c}</button>`).join("");
-    const list = PROJECTS.map((p, i) => [p, i]).filter(([p]) => cur === "All" || p.cat === cur);
-    g.innerHTML = list.map(([p, i]) => `<button class="tile" type="button" data-i="${i}"><canvas width="500" height="340"></canvas><div><b>${p.t}</b><small>${p.cat} · ${stoneById(p.stone).name}</small></div></button>`).join("");
-    $$(".tile", g).forEach(t => {
-      const p = PROJECTS[t.dataset.i], c = $("canvas", t);
-      layFloor(c.getContext("2d"), c.width, c.height, { stone: stoneById(p.stone), pattern: p.pattern, tileIn: p.size, ppi: c.width / 110, grout: "#cfc9bd", finish: p.finish, seed: +t.dataset.i * 100 + 3 });
-    });
+    shown = PROJECTS.filter(p => cur === "All" || p.cats.includes(cur));
+    g.innerHTML = shown.map((p, i) => `<button class="tile" type="button" data-i="${i}"><img src="${pimg(p, true)}" alt="${p.t}" loading="lazy"><div><b>${p.t}</b><small>${p.cat} · ${p.stone.split(";")[0]}</small></div></button>`).join("");
   };
   fl.addEventListener("click", e => { const b = e.target.closest("button"); if (b) { cur = b.textContent; show(); } });
-  const dlg = document.createElement("dialog"); document.body.append(dlg);
-  g.addEventListener("click", e => {
-    const t = e.target.closest(".tile"); if (!t) return;
-    const p = PROJECTS[t.dataset.i];
-    dlg.innerHTML = `<canvas width="1100" height="520"></canvas><div class="body"><h3>${p.t}</h3><p>${p.desc}</p><div class="row"><button class="btn" data-a="try" type="button">Try this design</button><button class="btn btn-ghost" data-a="close" type="button">Close</button></div></div>`;
-    const c = $("canvas", dlg);
-    layFloor(c.getContext("2d"), c.width, c.height, { stone: stoneById(p.stone), pattern: p.pattern, tileIn: p.size, ppi: c.width / 144, grout: "#cfc9bd", finish: p.finish, seed: +t.dataset.i * 100 + 3 });
-    dlg.dataset.i = t.dataset.i; dlg.showModal();
-  });
+  const dlg = document.createElement("dialog"); dlg.className = "lightbox"; dlg.setAttribute("aria-label", "Project details"); document.body.append(dlg);
+  const open = i => {
+    idx = (i + shown.length) % shown.length; const p = shown[idx];
+    dlg.innerHTML = `<div class="lb"><div class="lb-img"><img src="${pimg(p)}" alt="${p.t}"><button class="lb-nav prev" data-a="prev" aria-label="Previous project">‹</button><button class="lb-nav next" data-a="next" aria-label="Next project">›</button></div>
+      <div class="body"><p class="eyebrow">${p.cat} · ${idx + 1}/${shown.length}</p><h3>${p.t}</h3><p>${p.desc}</p>
+      <dl><dt>Material</dt><dd>${p.stone}</dd><dt>Layout</dt><dd>${p.layout}</dd><dt>Finish</dt><dd>${p.finish}</dd><dt>Setting</dt><dd>${p.where}</dd></dl>
+      <div class="row"><button class="btn" data-a="quote" type="button">Request something similar</button><button class="btn btn-ghost" data-a="close" type="button">Close</button></div></div></div>`;
+    if (!dlg.open) dlg.showModal();
+  };
+  g.addEventListener("click", e => { const t = e.target.closest(".tile"); if (t) open(+t.dataset.i); });
   dlg.addEventListener("click", e => {
     const a = e.target.closest("[data-a]")?.dataset.a;
     if (e.target === dlg || a === "close") dlg.close();
-    if (a === "try") {
-      const p = PROJECTS[dlg.dataset.i]; Object.assign(state, { stone: p.stone, pattern: p.pattern, finish: p.finish, size: p.size });
-      $("#tileSize").value = p.size; visualizer.refresh(); dlg.close(); $("#visualizer").scrollIntoView({ behavior: reduceMotion ? "auto" : "smooth" });
+    else if (a === "prev") open(idx - 1); else if (a === "next") open(idx + 1);
+    else if (a === "quote") {
+      $("#qMsg").value = `I'd like something similar to: ${shown[idx].t} (${shown[idx].stone}).`;
+      dlg.close(); $("#quote").scrollIntoView({ behavior: reduceMotion ? "auto" : "smooth" });
     }
   });
+  dlg.addEventListener("keydown", e => { if (e.key === "ArrowLeft") open(idx - 1); if (e.key === "ArrowRight") open(idx + 1); });
   show();
 }
 
