@@ -69,7 +69,7 @@
     idx = (i + view.length) % view.length; const p = view[idx];
     dlg.innerHTML = `<div class="lb"><div class="lb-img" id="lbImg"><img src="${pimg(p)}" alt="${esc(p.t)}" draggable="false">
       <button class="lb-nav prev" data-a="prev" aria-label="Previous photo">&lsaquo;</button><button class="lb-nav next" data-a="next" aria-label="Next photo">&rsaquo;</button>
-      <span class="lb-count">${idx + 1} / ${view.length}</span></div>
+      <span class="lb-count">${idx + 1} of ${view.length}</span></div>
       <div class="body"><p class="eyebrow">${esc(p.cat)}</p><h3>${esc(p.t)}</h3><p>${esc(p.desc)}</p>
       <dl><dt>Material</dt><dd>${esc(p.stone)}</dd><dt>Layout</dt><dd>${esc(p.layout)}</dd><dt>Finish</dt><dd>${esc(p.finish)}</dd><dt>Setting</dt><dd>${esc(p.where)}</dd></dl>
       <div class="row"><a class="btn" href="index.html#quote">Request something similar</a><button class="btn btn-ghost" data-a="close" type="button">Close</button></div></div></div>`;
