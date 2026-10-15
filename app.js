@@ -73,9 +73,9 @@ function visualizer() {
 
 /* ---------- process / testimonials / faq ---------- */
 const STEPS = [
-  { t: "Free site visit", time: "Day 1", d: "We measure, check the substrate, and talk through stone, layout and budget.", li: ["Moisture & flatness check", "Slab or tile selection help", "Written fixed-price quote"] },
-  { t: "Prep", time: "Days 2–3", d: "A great job is 80% preparation. We remove old surfaces and make the substrate flat and sound.", li: ["Demolition and disposal", "Self-levelling or patching", "Waterproofing where needed"] },
-  { t: "Layout & dry-fit", time: "Day 3–4", d: "Stone is dry-laid and blended across boxes so veining and shade flow naturally.", li: ["Centre-line layout to avoid thin cuts", "Shade blending", "Your sign-off before we set"] },
+  { t: "Free site visit", time: "Day 1", d: "The substrate is measured and checked, and stone, layout and budget are talked through.", li: ["Moisture & flatness check", "Slab or tile selection help", "Written fixed-price quote"] },
+  { t: "Prep", time: "Days 2–3", d: "A great job is 80% preparation. Old surfaces are removed and the substrate is made flat and sound.", li: ["Demolition and disposal", "Self-levelling or patching", "Waterproofing where needed"] },
+  { t: "Layout & dry-fit", time: "Day 3–4", d: "Stone is dry-laid and blended across boxes so veining and shade flow naturally.", li: ["Centre-line layout to avoid thin cuts", "Shade blending", "Your sign-off before setting begins"] },
   { t: "Setting", time: "Days 4–7", d: "Back-buttered, full-coverage setting with the right thin-set for the stone, kept lippage-free.", li: ["White thin-set to prevent bleed-through", "Levelling clips", "Precision wet-saw cuts"] },
   { t: "Grout, seal & polish", time: "Final day", d: "Grout, cleaning, sealing and final polish, then a walkthrough together.", li: ["Penetrating sealer", "Final clean and inspection", "Care guide for your stone"] }
 ];
@@ -96,17 +96,17 @@ function process() {
 }
 const FAQ = [
   ["How long does a typical floor take?", "Most rooms take 3–6 working days including prep, setting, grouting and sealing. Large or complex layouts like herringbone take longer."],
-  ["Does marble stain or scratch easily?", "Marble is calcium-based, so acids (lemon, wine, some cleaners) can etch it. Honed finishes hide wear better than polished. We seal every installation and give you a care guide."],
-  ["Can marble be used in a shower?", "Yes, when properly waterproofed and sealed. We use a membrane system and white thin-set to prevent staining."],
-  ["Do you supply the stone?", "Either way works. We source from trusted suppliers or install material you bought — we'll check it for flatness and defects first."],
-  ["Is underfloor heating compatible?", "Yes. Marble conducts heat very well. We install electric mats beneath the stone as an optional extra."],
+  ["Does marble stain or scratch easily?", "Marble is calcium-based, so acids (lemon, wine, some cleaners) can etch it. Honed finishes hide wear better than polished. Every installation is sealed and comes with a care guide."],
+  ["Can marble be used in a shower?", "Yes, when properly waterproofed and sealed. A membrane system and white thin-set prevent staining."],
+  ["Do you supply the stone?", "Either way works. Stone can be sourced from trusted suppliers, or material you bought can be installed after it is checked for flatness and defects."],
+  ["Is underfloor heating compatible?", "Yes. Marble conducts heat very well. Electric mats can be installed beneath the stone as an optional extra."],
   ["How do I clean marble?", "Use a pH-neutral stone cleaner and a soft mop. Avoid vinegar, bleach and abrasive powders."]
 ];
 function faq() {
   const list = $("#faqList");
   const draw = q => {
     const rows = FAQ.filter(([a, b]) => (a + b).toLowerCase().includes(q.toLowerCase()));
-    list.innerHTML = rows.length ? rows.map(([a, b]) => `<details><summary>${a}</summary><p>${b}</p></details>`).join("") : '<p class="muted">No matches — ask us in the form below.</p>';
+    list.innerHTML = rows.length ? rows.map(([a, b]) => `<details><summary>${a}</summary><p>${b}</p></details>`).join("") : '<p class="muted">No matches. Ask in the quote form below.</p>';
   };
   $("#faqSearch").addEventListener("input", e => draw(e.target.value)); draw("");
 }
@@ -146,7 +146,7 @@ function quoteForm() {
     const list = store.get("wms-requests", []); list.unshift(rec); store.set("wms-requests", list.slice(0, 10)); drawSaved();
     const body = `Name: ${rec.name}\nPhone: ${rec.phone}\nEmail: ${rec.email}\nZIP: ${rec.zip}\nStart: ${rec.when}\nDesign: ${s.name}, ${state.pattern}, ${state.size}" tiles, ${state.finish}, grout ${state.grout}\nSaved selections: ${sel.length ? sel.map(i => `${i.name} (${i.finish})`).join("; ") : "none"}\nPhotos to follow: ${$("#qPhotos").checked ? "yes" : "no"}\n\n${rec.msg}`;
     const href = `mailto:${CONFIG.email}?subject=${encodeURIComponent("Quote request — " + rec.name)}&body=${encodeURIComponent(body)}`;
-    $("#formStatus").innerHTML = `Thanks, ${rec.name.split(" ")[0]} — request saved on this device. <a href="${href}" style="color:#d3b06a">Click here to email it to us</a> to send it.`;
+    $("#formStatus").innerHTML = `Thanks, ${rec.name.split(" ")[0]} — request saved on this device. <a href="${href}" style="color:#d3b06a">Click here to email it to Whitestone</a> to send it.`;
     form.reset(); toast("Request saved");
   });
   drawSaved();

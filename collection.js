@@ -138,7 +138,7 @@
         ${s.view === "layout" ? `<div class="pv-ctl"><span class="pv-l">Layout</span><div class="seg">${PATTERNS.map(x => `<button type="button" data-a="pattern" data-v="${x.id}" aria-pressed="${x.id === s.pattern}">${x.name}</button>`).join("")}</div></div>
         <div class="pv-ctl"><span class="pv-l">Grout</span><div class="seg">${GROUTS.map(g => `<button type="button" data-a="grout" data-v="${g.id}" aria-pressed="${g.id === s.grout}"><i class="gdot" style="background:${g.id}"></i>${g.name}</button>`).join("")}</div></div>` : ""}
         <dl class="pv-dl"><div><dt>Colour</dt><dd>${esc(p.color)} &mdash; ${esc(p.tone)}</dd></div><div><dt>Finishes</dt><dd>${esc(p.finishes.join(", "))}</dd></div><div><dt>Sizes</dt><dd>${esc(p.sizes.join(", "))}</dd></div><div><dt>Applications</dt><dd>${esc(p.uses.join(", "))}</dd></div>${p.origin ? `<div><dt>Origin</dt><dd>${esc(p.origin)}</dd></div>` : ""}<div><dt>Suggested layout</dt><dd>${esc(p.layout)}</dd></div></dl>
-        <p class="fine">On-screen colours and veining are an approximation. Natural stone varies from slab to slab, so we recommend viewing samples before you select.</p>
+        <p class="fine">On-screen colours and veining are an approximation. Natural stone varies from slab to slab, so viewing samples before selecting is recommended.</p>
         <div class="row"><button class="btn" data-a="save" type="button">${isSaved(p.id) ? "Remove from selections" : "Save to selections"}</button><button class="btn btn-ghost" data-a="quote" type="button">Request a quote</button><button class="btn btn-ghost" data-a="close" type="button">Close</button></div>
       </div></div>`;
     const c = $("canvas", pv), ctx = c.getContext("2d");
