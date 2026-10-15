@@ -105,7 +105,7 @@
   function open() {
     if (opened) return;
     if (mode === "3d" && !ensureWorld()) { $("#intro").scrollIntoView({ behavior: reduce ? "auto" : "smooth" }); return; }
-    opened = true; sec.classList.add("open"); sec.focus({ preventScroll: true });
+    opened = true; document.body.classList.add("tour-open"); sec.classList.add("open"); sec.focus({ preventScroll: true });
     ui.hidden = false; seek(0); showChapter(chapAt(T));
     const done = () => { banner.hidden = true; };
     reduce ? done() : setTimeout(done, 800);
@@ -118,30 +118,23 @@
   $("#tourReplay")?.addEventListener("click", () => { seek(0); setPlaying(true); });
   setPlayIcon();
 
-  /* ---------- banner art: drawn once, no animation ---------- */
+  /* ---------- banner art: a pale marble sky over a dark Emperador floor, drawn once (no animation) ---------- */
   function bannerArt() {
     const bg = $("#bnBg"); if (!bg) return;
     const paint = () => {
-      const W = bg.width = Math.min(1920, bg.clientWidth || 1440), H = bg.height = Math.min(1100, bg.clientHeight || 900), g = bg.getContext("2d"), r = rng(77);
-      const base = g.createLinearGradient(0, 0, W, H); base.addColorStop(0, "#05070b"); base.addColorStop(.55, "#0a0f16"); base.addColorStop(1, "#060a10");
-      g.fillStyle = base; g.fillRect(0, 0, W, H);
-      for (let i = 0; i < 5; i++) { const cx = r() * W, cy = r() * H, cr = (.25 + r() * .4) * Math.max(W, H), rg = g.createRadialGradient(cx, cy, 0, cx, cy, cr); rg.addColorStop(0, "rgba(30,48,66,.35)"); rg.addColorStop(1, "rgba(30,48,66,0)"); g.fillStyle = rg; g.fillRect(0, 0, W, H); }
-      g.lineCap = "round"; g.lineJoin = "round";
-      const vein = (x, y, ang, len, w, depth) => {
-        let px = x, py = y, a = ang; g.beginPath(); g.moveTo(px, py); const pts = [[px, py]], seg = 16;
-        for (let s = 0; s < seg; s++) { a += (r() - .5) * .7; const l = len / seg; px += Math.cos(a) * l; py += Math.sin(a) * l; pts.push([px, py]); g.lineTo(px, py); if (depth < 2 && r() < .16) vein(px, py, a + (r() > .5 ? 1 : -1) * (.5 + r() * .7), len * .45, w * .55, depth + 1); }
-        const pass = (lw, col, blur, al) => { g.save(); g.globalAlpha = al; g.strokeStyle = col; g.lineWidth = lw; g.shadowColor = "#37d6ff"; g.shadowBlur = blur; g.beginPath(); pts.forEach((p, i) => g[i ? "lineTo" : "moveTo"](p[0], p[1])); g.stroke(); g.restore(); };
-        pass(w * 6, "#0f86a8", 24, .09); pass(w * 2.4, "#35d4f7", 14, .24); pass(w, "#d9fbff", 6, .7);
-      };
-      for (let i = 0; i < 6; i++) vein(r() * W * 1.1 - W * .05, -20 + r() * H * .4, 1.05 + (r() - .5) * 1.1, Math.max(W, H) * (.5 + r() * .6), .7 + r() * 1.3, 0);
-      for (let i = 0; i < 3; i++) vein(-20, r() * H, (r() - .5) * .7, W * .8, 1, 1);
+      const W = bg.width = Math.min(1920, bg.clientWidth || 1440), H = bg.height = Math.min(1100, bg.clientHeight || 900), g = bg.getContext("2d"), hz = Math.round(H * .64);
+      const sky = g.createLinearGradient(0, 0, 0, hz); sky.addColorStop(0, "#a8afb9"); sky.addColorStop(.55, "#d0cac7"); sky.addColorStop(1, "#f0d6c3");
+      g.fillStyle = sky; g.fillRect(0, 0, W, hz);
+      const off = document.createElement("canvas"); off.width = W; off.height = hz;
+      drawStone(off.getContext("2d"), 0, 0, W, hz, { ...stoneByIdAny("carrara"), strength: 1 }, 5, "honed");
+      g.save(); g.globalAlpha = .2; try { g.filter = "blur(1.5px)"; } catch (e) { /* optional */ } g.drawImage(off, 0, 0); g.restore();
+      const glow = g.createLinearGradient(0, hz - H * .16, 0, hz); glow.addColorStop(0, "rgba(255,236,214,0)"); glow.addColorStop(1, "rgba(255,236,214,.6)");
+      g.fillStyle = glow; g.fillRect(0, hz - H * .16, W, H * .16);
+      drawStone(g, 0, hz, W, H - hz, { ...stoneByIdAny("emperador"), strength: 1 }, 12, "polished");
+      const dark = g.createLinearGradient(0, hz, 0, H); dark.addColorStop(0, "rgba(58,40,26,.25)"); dark.addColorStop(1, "rgba(22,14,8,.62)");
+      g.fillStyle = dark; g.fillRect(0, hz, W, H - hz);
+      g.fillStyle = "rgba(255,240,222,.45)"; g.fillRect(0, hz, W, 1);
     };
     paint(); let rt; addEventListener("resize", () => { clearTimeout(rt); rt = setTimeout(paint, 200); });
-    /* featured slabs */
-    [["calacatta", "Calacatta"], ["nero", "Nero Marquina"], ["verde", "Verde Alpi"], ["statuario", "Statuario"], ["arabescato", "Arabescato"]].forEach(([id], i) => {
-      const c = document.querySelector(`.slab[data-id="${id}"] canvas`); if (c) drawStone(c.getContext("2d"), 0, 0, c.width, c.height, stoneByIdAny(id), 30 + i * 7, "polished");
-    });
-    const set = (id, v) => { const el = document.getElementById(id); if (el) el.textContent = v; };
-    set("bnStones", CATALOG.length); set("bnMats", new Set(CATALOG.map(c => c.mat)).size); set("bnProjects", typeof PROJECTS !== "undefined" ? PROJECTS.length : 16);
   }
 })();
