@@ -1,26 +1,21 @@
 "use strict";
-/* Home-page walkthrough: stone doors open onto a first-person drone tour (3D rendering, or a real video if TOUR_VIDEO is set). */
+/* Home-page banner: a dusk skyline that opens into a first-person drone tour (3D rendering, or a real video if TOUR_VIDEO is set). */
 (function () {
   const $ = (s, r = document) => r.querySelector(s);
   const sec = $("#tour"); if (!sec) return;
   const reduce = matchMedia("(prefers-reduced-motion: reduce)").matches;
-  const enterBtn = $("#enterBtn"), doors = $("#doors"), ui = $("#tourUi"), range = $("#tourRange"), timeEl = $("#tourTime");
+  const enterBtn = $("#enterBtn"), banner = $("#banner"), starts = [...document.querySelectorAll(".js-start")], ui = $("#tourUi"), range = $("#tourRange"), timeEl = $("#tourTime");
   const playBtn = $("#tourPlay"), capEl = $("#tourCap"), pills = $("#tourPills"), ticks = $("#tourTicks"), fade = $("#tourFade"), hint = $("#tourHint");
   const fmt = s => `${Math.floor(s / 60)}:${String(Math.floor(s % 60)).padStart(2, "0")}`;
 
-  /* marble door faces, painted once with the site's own stone renderer */
-  try {
-    const c = document.createElement("canvas"); c.width = 1600; c.height = 900;
-    const st = { ...stoneByIdAny("calacatta"), strength: 1 };
-    drawStone(c.getContext("2d"), 0, 0, 1600, 900, st, 4242, "polished");
-    const url = c.toDataURL("image/jpeg", .85);
-    $$doors(".door").forEach((d, i) => { d.style.backgroundImage = `url(${url})`; d.style.backgroundPosition = i ? "right center" : "left center"; });
-  } catch (e) { /* plain doors */ }
-  function $$doors(s) { return [...doors.querySelectorAll(s)]; }
+  /* header turns solid once the page scrolls; swatch in the banner note card */
+  const hd = $("#header"), onScroll = () => hd.classList.toggle("solid", scrollY > 40);
+  onScroll(); addEventListener("scroll", onScroll, { passive: true });
+  try { const sw = $("#bnSwatch"); drawStone(sw.getContext("2d"), 0, 0, sw.width, sw.height, stoneByIdAny("calacatta"), 9, "polished"); } catch (e) { /* optional */ }
 
   /* ---------- player adapters ---------- */
   let world = null, video = null, mode = "none";
-  let ending = false, T = 0, DUR = TOUR_DURATION, playing = false, yaw = 0, pitch = 0, dragging = false, active = false, last = 0, raf = 0, slow = 0, frames = 0;
+  let idleClock = 0, idleT = 2.5, ending = false, T = 0, DUR = TOUR_DURATION, playing = false, yaw = 0, pitch = 0, dragging = false, active = false, last = 0, raf = 0, slow = 0, frames = 0;
   const chapters = TOUR_CHAPTERS;
   const chapAt = s => { let i = 0; chapters.forEach((c, k) => { if (s >= c.t / TOUR_DURATION * DUR) i = k; }); return i; };
 
@@ -74,6 +69,7 @@
   function tick(now) {
     raf = requestAnimationFrame(tick);
     const dt = Math.min(.1, (now - last) / 1000); last = now;
+    if (!opened) { if (world) { if (!reduce) idleClock += dt; idleT = 2.5 + 2.4 * Math.sin(idleClock * .22); world.setTime(idleT, 0, 0, dt); world.render(); } return; }
     if (mode === "video") { T = video.currentTime; sync(); return; }
     if (playing) { T += dt; if (T >= DUR && !ending) { ending = true; fade.classList.add("on"); setTimeout(() => { T = 0; ending = false; fade.classList.remove("on"); }, 600); } if (ending) T = Math.min(T, DUR - .001); }
     if (!dragging) { const k = Math.min(1, dt * 1.8); yaw -= yaw * k; pitch -= pitch * k; }
@@ -81,7 +77,7 @@
     if (world && dt > 0) { slow += dt > .034 ? 1 : -.5; slow = Math.max(0, slow); if (++frames > 90 && slow > 40 && world.ratio > 1) { world.setRatio(1); } }
   }
   document.addEventListener("visibilitychange", loop);
-  new IntersectionObserver(es => { active = es[0].isIntersecting && sec.classList.contains("open"); loop(); }, { threshold: .15 }).observe(sec);
+  new IntersectionObserver(es => { active = es[0].isIntersecting; loop(); }, { threshold: .15 }).observe(sec);
   addEventListener("resize", () => { if (world) { world.resize(); drawNow(); } });
 
   /* ---------- controls ---------- */
@@ -104,22 +100,19 @@
   });
   ["pointerup", "pointercancel"].forEach(t => cv.addEventListener(t, () => { dragging = false; }));
 
-  /* ---------- opening the doors ---------- */
+  /* ---------- opening the tour ---------- */
   let opened = false;
   function open() {
     if (opened) return; opened = true; sec.classList.add("open"); sec.focus({ preventScroll: true });
-    ui.hidden = false; seek(0); showChapter(0);
-    const done = () => { doors.hidden = true; };
-    reduce ? done() : setTimeout(done, 2000);
+    ui.hidden = false; seek(mode === "3d" ? idleT : 0); showChapter(chapAt(T));
+    const done = () => { banner.hidden = true; };
+    reduce ? done() : setTimeout(done, 800);
     active = true; setPlaying(!reduce);
     if (!reduce) { hint.classList.add("on"); setTimeout(() => hint.classList.remove("on"), 7000); }
   }
-  if (mode === "none") { enterBtn.textContent = "Explore the site"; enterBtn.addEventListener("click", () => $("#intro").scrollIntoView({ behavior: reduce ? "auto" : "smooth" })); }
-  else {
-    enterBtn.addEventListener("click", open);
-    ["mouseenter", "focus"].forEach(t => enterBtn.addEventListener(t, () => doors.classList.add("peek")));
-    ["mouseleave", "blur"].forEach(t => enterBtn.addEventListener(t, () => doors.classList.remove("peek")));
-  }
+  if (mode === "none") { enterBtn.textContent = "Explore the site"; starts.forEach(b => b.addEventListener("click", () => $("#intro").scrollIntoView({ behavior: reduce ? "auto" : "smooth" }))); }
+  else starts.forEach(b => b.addEventListener("click", open));
+  if (mode === "video") { video.currentTime = 0.01; }
   $("#tourReplay")?.addEventListener("click", () => { seek(0); setPlaying(true); });
   setPlayIcon();
 })();
