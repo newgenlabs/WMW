@@ -124,31 +124,19 @@ function layFloor(ctx, W, H, o) {
   }
 }
 
-/* ---------- hero background ---------- */
-function heroBackground() {
-  const c = $("#heroCanvas"), ctx = c.getContext("2d");
-  const draw = () => {
-    c.width = c.clientWidth; c.height = c.clientHeight;
-    drawStone(ctx, 0, 0, c.width, c.height, { ...stoneById("carrara"), strength: 0.8 }, 11, "polished");
-    const fade = ctx.createLinearGradient(0, 0, c.width * 0.8, 0);
-    fade.addColorStop(0, "rgba(250,248,244,.92)"); fade.addColorStop(1, "rgba(250,248,244,.1)");
-    ctx.fillStyle = fade; ctx.fillRect(0, 0, c.width, c.height);
-  };
-  draw(); let t; addEventListener("resize", () => { clearTimeout(t); t = setTimeout(draw, 150); });
-}
-
 /* ---------- services ---------- */
 const SERVICES = [
-  { ico: "🏛️", t: "Floors", d: "Entryways, kitchens, living areas — flat, flush and lippage-free.", type: "floor" },
-  { ico: "🚿", t: "Showers & baths", d: "Waterproofed, sloped and sealed for decades of use.", type: "shower" },
-  { ico: "🪜", t: "Stairs & thresholds", d: "Precisely cut treads, risers and nosings.", type: "stairs" },
-  { ico: "🧱", t: "Walls & backsplashes", d: "Book-matched slabs, mosaics and feature walls.", type: "wall" },
-  { ico: "✨", t: "Restoration", d: "Honing, polishing, re-grouting and stain removal.", type: "floor" },
-  { ico: "🔥", t: "Fireplaces & surrounds", d: "Heat-rated setting materials and clean mitred edges.", type: "wall" }
+  { t: "Floors", d: "Entries, kitchens, lobbies and living areas: flat, flush and lippage-free.", type: "floor" },
+  { t: "Showers and baths", d: "Slab and tile surrounds, waterproofed, sloped and sealed.", type: "shower" },
+  { t: "Stairs and thresholds", d: "Precisely cut treads, risers, nosings and inlay borders.", type: "stairs" },
+  { t: "Walls and backsplashes", d: "Book-matched slabs, mosaics and feature walls.", type: "wall" },
+  { t: "Countertops and islands", d: "Waterfall edges, mitred returns and vein-matched seams.", type: "wall" },
+  { t: "Restoration", d: "Honing, polishing, re-grouting and stain removal.", type: "floor" }
 ];
 function services() {
-  $("#serviceCards").innerHTML = SERVICES.map((s, i) => `<article class="card reveal"><div class="ico" aria-hidden="true">${s.ico}</div><h3>${s.t}</h3><p>${s.d}</p><button type="button" data-i="${i}">Estimate this →</button></article>`).join("");
-  $("#serviceCards").addEventListener("click", e => {
+  const list = $("#serviceList");
+  list.innerHTML = SERVICES.map((s, i) => `<li><button type="button" data-i="${i}"><span class="sv-n">${String(i + 1).padStart(2, "0")}</span><span class="sv-t">${s.t}</span><span class="sv-d">${s.d}</span><span class="sv-a" aria-hidden="true">&rarr;</span></button></li>`).join("");
+  list.addEventListener("click", e => {
     const b = e.target.closest("button[data-i]"); if (!b) return;
     $("#eType").value = SERVICES[b.dataset.i].type; syncTypeLabels(); estimate();
     $("#estimator").scrollIntoView({ behavior: reduceMotion ? "auto" : "smooth" });
@@ -250,44 +238,6 @@ function estimator() {
   syncTypeLabels(); estimate();
 }
 
-/* ---------- before / after ---------- */
-function beforeAfter() {
-  const box = $("#ba"), after = $("#baAfter"), before = $("#baBefore"), wrap = $(".ba-before", box), handle = $(".ba-handle", box);
-  const paint = () => {
-    const W = box.clientWidth, H = box.clientHeight;
-    [after, before].forEach(c => { c.width = W; c.height = H; });
-    const a = after.getContext("2d");
-    layFloor(a, W, H, { stone: stoneById("calacatta"), pattern: "checker", tileIn: 24, ppi: W / 150, grout: "#d8d4cc", finish: "polished", seed: 42, gap: 2 });
-    // worn "before"
-    const b = before.getContext("2d"), r = rng(5);
-    layFloor(b, W, H, { stone: { id: "old", name: "old", base: "#c9b79a", base2: "#b8a283", vein: "#8c7a5e", strength: 0.1, pair: "carrara" }, pattern: "straight", tileIn: 12, ppi: W / 150, grout: "#6e6252", finish: "tumbled", seed: 9, gap: 3 });
-    b.lineWidth = 1.2;
-    for (let i = 0; i < 16; i++) { // cracks
-      let x = r() * W, y = r() * H; b.strokeStyle = "rgba(40,30,20,.55)"; b.beginPath(); b.moveTo(x, y);
-      for (let j = 0; j < 6; j++) { x += (r() - 0.5) * 50; y += (r() - 0.3) * 40; b.lineTo(x, y); }
-      b.stroke();
-    }
-    for (let i = 0; i < 9; i++) { // stains
-      const x = r() * W, y = r() * H, rad = 20 + r() * 60, g = b.createRadialGradient(x, y, 0, x, y, rad);
-      g.addColorStop(0, "rgba(70,50,30,.35)"); g.addColorStop(1, "rgba(70,50,30,0)"); b.fillStyle = g; b.fillRect(x - rad, y - rad, rad * 2, rad * 2);
-    }
-  };
-  let pct = 50;
-  const set = p => {
-    pct = Math.max(0, Math.min(100, p));
-    wrap.style.clipPath = `inset(0 ${100 - pct}% 0 0)`; handle.style.left = pct + "%"; box.setAttribute("aria-valuenow", Math.round(pct));
-  };
-  const fromEvent = e => set((e.clientX - box.getBoundingClientRect().left) / box.clientWidth * 100);
-  box.addEventListener("pointerdown", e => { box.setPointerCapture(e.pointerId); fromEvent(e); });
-  box.addEventListener("pointermove", e => { if (box.hasPointerCapture(e.pointerId)) fromEvent(e); });
-  box.addEventListener("keydown", e => {
-    if (e.key === "ArrowLeft") set(pct - 5); else if (e.key === "ArrowRight") set(pct + 5);
-    else if (e.key === "Home") set(0); else if (e.key === "End") set(100); else return;
-    e.preventDefault();
-  });
-  paint(); set(50); let t; addEventListener("resize", () => { clearTimeout(t); t = setTimeout(paint, 150); });
-}
-
 /* ---------- gallery ---------- */
 const PROJECTS = [
   { n: 1, t: "Sculpted curved lobby counter", cat: "Commercial", cats: ["Commercial", "Countertops"], stone: "White quartz, soft grey veining", layout: "Single sweeping curve, thick rounded edge, matched veining along the run", finish: "Polished", where: "Building lobby / amenity space",
@@ -331,7 +281,7 @@ function gallery() {
   const show = () => {
     fl.innerHTML = cats.map(c => `<button type="button" aria-pressed="${c === cur}">${c}</button>`).join("");
     shown = PROJECTS.filter(p => cur === "All" || p.cats.includes(cur));
-    g.innerHTML = shown.map((p, i) => `<button class="tile" type="button" data-i="${i}"><img src="${pimg(p, true)}" alt="${p.t}" loading="lazy"><div><b>${p.t}</b><small>${p.cat} · ${p.stone.split(";")[0]}</small></div></button>`).join("");
+    g.innerHTML = shown.map((p, i) => `<button class="tile" type="button" data-i="${i}"><img src="${pimg(p, true)}" alt="${p.t}" loading="lazy"><span class="cap"><b>${p.t}</b><small>${p.cat}</small></span></button>`).join("");
   };
   fl.addEventListener("click", e => { const b = e.target.closest("button"); if (b) { cur = b.textContent; show(); } });
   const dlg = document.createElement("dialog"); dlg.className = "lightbox"; dlg.setAttribute("aria-label", "Project details"); document.body.append(dlg);
@@ -363,7 +313,7 @@ const STEPS = [
   { t: "Prep", time: "Days 2–3", d: "A great job is 80% preparation. We remove old surfaces and make the substrate flat and sound.", li: ["Demolition and disposal", "Self-levelling or patching", "Waterproofing where needed"] },
   { t: "Layout & dry-fit", time: "Day 3–4", d: "Stone is dry-laid and blended across boxes so veining and shade flow naturally.", li: ["Centre-line layout to avoid thin cuts", "Shade blending", "Your sign-off before we set"] },
   { t: "Setting", time: "Days 4–7", d: "Back-buttered, full-coverage setting with the right thin-set for the stone, kept lippage-free.", li: ["White thin-set to prevent bleed-through", "Levelling clips", "Precision wet-saw cuts"] },
-  { t: "Grout, seal & polish", time: "Final day", d: "Grout, cleaning, sealing and final polish, then a walkthrough together.", li: ["Penetrating sealer", "Final clean and inspection", "Care guide and warranty"] }
+  { t: "Grout, seal & polish", time: "Final day", d: "Grout, cleaning, sealing and final polish, then a walkthrough together.", li: ["Penetrating sealer", "Final clean and inspection", "Care guide for your stone"] }
 ];
 function process() {
   const tabs = $("#stepTabs"), panel = $("#stepPanel"); let cur = 0;
@@ -380,34 +330,16 @@ function process() {
   });
   draw();
 }
-const QUOTES = [
-  ["They found a problem in our subfloor that two other contractors missed. The finished floor is flawless.", "Sample client — kitchen floor"],
-  ["Our Calacatta shower looks like a hotel spa. Clean, on time and tidy every single day.", "Sample client — primary bath"],
-  ["Honest quote, no surprises, and the herringbone layout is stunning.", "Sample client — entry hall"]
-];
-function testimonials() {
-  const box = $("#quotes"), dots = $("#quoteDots"); let i = 0, timer;
-  const draw = () => {
-    box.innerHTML = `<blockquote>“${QUOTES[i][0]}”<cite>${QUOTES[i][1]}</cite></blockquote>`;
-    dots.innerHTML = QUOTES.map((_, n) => `<button type="button" aria-label="Testimonial ${n + 1}" ${n === i ? 'aria-current="true"' : ""} data-n="${n}"></button>`).join("");
-  };
-  const auto = () => { clearInterval(timer); if (!reduceMotion) timer = setInterval(() => { i = (i + 1) % QUOTES.length; draw(); }, 6500); };
-  dots.addEventListener("click", e => { const b = e.target.closest("button"); if (b) { i = +b.dataset.n; draw(); auto(); } });
-  box.addEventListener("mouseenter", () => clearInterval(timer)); box.addEventListener("mouseleave", auto);
-  draw(); auto();
-}
 const FAQ = [
   ["How long does a typical floor take?", "Most rooms take 3–6 working days including prep, setting, grouting and sealing. Large or complex layouts like herringbone take longer."],
   ["Does marble stain or scratch easily?", "Marble is calcium-based, so acids (lemon, wine, some cleaners) can etch it. Honed finishes hide wear better than polished. We seal every installation and give you a care guide."],
   ["Can marble be used in a shower?", "Yes, when properly waterproofed and sealed. We use a membrane system and white thin-set to prevent staining."],
   ["Do you supply the stone?", "Either way works. We source from trusted suppliers or install material you bought — we'll check it for flatness and defects first."],
   ["Is underfloor heating compatible?", "Yes. Marble conducts heat very well. We install electric mats beneath the stone as an optional extra."],
-  ["Do you offer a warranty?", "All installations carry a two-year workmanship warranty, covering setting and grouting defects."],
   ["How do I clean marble?", "Use a pH-neutral stone cleaner and a soft mop. Avoid vinegar, bleach and abrasive powders."]
 ];
 function faq() {
   const list = $("#faqList");
-  list.insertAdjacentHTML("beforebegin", '<input class="faq-search" id="faqSearch" type="search" placeholder="Search questions…" aria-label="Search questions">');
   const draw = q => {
     const rows = FAQ.filter(([a, b]) => (a + b).toLowerCase().includes(q.toLowerCase()));
     list.innerHTML = rows.length ? rows.map(([a, b]) => `<details><summary>${a}</summary><p>${b}</p></details>`).join("") : '<p class="muted">No matches — ask us in the form below.</p>';
@@ -463,11 +395,6 @@ function page() {
   nav.addEventListener("click", e => { if (e.target.closest("a")) { nav.classList.remove("open"); tog.setAttribute("aria-expanded", false); } });
   const io = new IntersectionObserver(es => es.forEach(e => { if (e.isIntersecting) { e.target.classList.add("in"); io.unobserve(e.target); } }), { threshold: 0.12 });
   $$(".section .wrap > *, .reveal").forEach(el => { el.classList.add("reveal"); io.observe(el); });
-  $$("[data-count]").forEach(el => {
-    const end = +el.dataset.count; if (reduceMotion) return void (el.textContent = end.toLocaleString());
-    const t0 = performance.now(), step = t => { const k = Math.min(1, (t - t0) / 1400); el.textContent = Math.round(end * (1 - Math.pow(1 - k, 3))).toLocaleString(); if (k < 1) requestAnimationFrame(step); };
-    requestAnimationFrame(step);
-  });
 }
 
-heroBackground(); services(); visualizer(); estimator(); beforeAfter(); gallery(); process(); testimonials(); faq(); quoteForm(); page();
+services(); visualizer(); estimator(); gallery(); process(); faq(); quoteForm(); page();
