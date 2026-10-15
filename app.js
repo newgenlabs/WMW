@@ -11,6 +11,9 @@ const store = {
 };
 const reduceMotion = matchMedia("(prefers-reduced-motion: reduce)").matches;
 
+/* Saved selections (stone & tile collection), shared with the quote form */
+const selectionsList = () => store.get("wms-sel", []).map(e => { const p = stoneByIdAny(e.id); return p && { id: p.id, name: p.name, mat: p.mat, finish: e.finish || p.finishes[0] }; }).filter(Boolean);
+
 function toast(msg) {
   const t = $("#toast"); t.textContent = msg; t.classList.add("show");
   clearTimeout(toast.t); toast.t = setTimeout(() => t.classList.remove("show"), 2800);
@@ -25,7 +28,7 @@ const STONES = [
   { id: "travertine",name: "Travertine",     base: "#dccdb2", base2: "#cbb998", vein: "#a8946f", strength: 0.35, mat: 15, note: "Warm, earthy and naturally textured.", pair: "emperador" },
   { id: "verde",     name: "Verde Alpi",     base: "#2f4a3f", base2: "#223a31", vein: "#c9d6cc", strength: 0.7, mat: 34, note: "Rich green with white mineral veins.", pair: "carrara" }
 ];
-const stoneById = id => STONES.find(s => s.id === id);
+const stoneById = id => STONES.find(s => s.id === id) || stoneByIdAny(id);
 
 const PATTERNS = [
   { id: "straight",   name: "Straight",   labor: 14, waste: 0.08 },
@@ -36,38 +39,32 @@ const PATTERNS = [
 ];
 const GROUTS = [{ id: "#d8d4cc", name: "Light" }, { id: "#9c978d", name: "Grey" }, { id: "#3b3a38", name: "Charcoal" }, { id: "#c4b08a", name: "Sand" }];
 const FINISHES = [{ id: "polished", name: "Polished" }, { id: "honed", name: "Honed" }, { id: "tumbled", name: "Tumbled" }];
-const TYPES = { floor: { mult: 1, label: ["Length", "Width"] }, wall: { mult: 1.15, label: ["Length", "Height"] }, shower: { mult: 1.45, label: ["Total wall length", "Height"] }, stairs: { mult: 1.6, label: ["Number of steps", "Stair width"] } };
 
-const state = { stone: "carrara", pattern: "herringbone", size: 12, grout: GROUTS[0].id, finish: "polished", seedBase: 7, estimate: null };
+const state = { stone: "carrara", pattern: "herringbone", size: 12, grout: GROUTS[0].id, finish: "polished", seedBase: 7 };
 
 /* ---------- procedural marble ---------- */
 function rng(seed) { // mulberry32
   let a = seed >>> 0;
   return () => { a |= 0; a = a + 0x6D2B79F5 | 0; let t = Math.imul(a ^ a >>> 15, 1 | a); t = t + Math.imul(t ^ t >>> 7, 61 | t) ^ t; return ((t ^ t >>> 14) >>> 0) / 4294967296; };
 }
-function drawStone(ctx, x, y, w, h, stone, seed, finish = "polished") {
-  const r = rng(seed);
-  ctx.save();
-  ctx.beginPath(); ctx.rect(x, y, w, h); ctx.clip();
-  const g = ctx.createLinearGradient(x, y, x + w, y + h);
-  g.addColorStop(0, stone.base); g.addColorStop(1, stone.base2);
-  ctx.fillStyle = g; ctx.fillRect(x, y, w, h);
-  // soft clouds
-  for (let i = 0; i < 4; i++) {
+const hexToRgb = h => [1, 3, 5].map(i => parseInt(h.slice(i, i + 2), 16));
+const shade = (h, amt) => { const f = v => Math.max(0, Math.min(255, Math.round(v + amt))); const [r, g, b] = hexToRgb(h); return `rgb(${f(r)},${f(g)},${f(b)})`; };
+const lum = h => { const [r, g, b] = hexToRgb(h); return (0.299 * r + 0.587 * g + 0.114 * b) / 255; };
+
+function drawVeins(ctx, x, y, w, h, stone, r) {
+  for (let i = 0; i < 4; i++) { // soft clouds
     const cx = x + r() * w, cy = y + r() * h, cr = (0.4 + r() * 0.6) * Math.max(w, h);
     const rg = ctx.createRadialGradient(cx, cy, 0, cx, cy, cr);
     rg.addColorStop(0, stone.base2 + "88"); rg.addColorStop(1, stone.base2 + "00");
     ctx.fillStyle = rg; ctx.fillRect(x, y, w, h);
   }
-  // veins: random-walk polylines, smoothed
-  const veins = 1 + Math.round(stone.strength * 2);
+  const veins = 1 + Math.round(stone.strength * 2) + Math.floor(Math.min(w, h) / 110);
   ctx.lineCap = "round"; ctx.lineJoin = "round"; ctx.strokeStyle = stone.vein;
   for (let v = 0; v < veins; v++) {
     const horiz = r() > 0.5, diag = (r() - 0.5) * 1.2;
     let px = horiz ? x - 10 : x + r() * w, py = horiz ? y + r() * h : y - 10;
-    const main = r() < 0.5;
+    const main = r() < 0.5, steps = 9;
     ctx.beginPath(); ctx.moveTo(px, py);
-    const steps = 9;
     for (let s = 0; s < steps; s++) {
       const dx = horiz ? (w + 20) / steps : (r() - 0.5) * w * 0.2 + diag * 6;
       const dy = horiz ? (r() - 0.5) * h * 0.2 + diag * 6 : (h + 20) / steps;
@@ -78,18 +75,113 @@ function drawStone(ctx, x, y, w, h, stone, seed, finish = "polished") {
     ctx.globalAlpha = (main ? 0.35 : 0.18) * (0.5 + stone.strength);
     ctx.lineWidth = main ? Math.max(1, Math.min(4, Math.min(w, h) * 0.02 * (0.5 + stone.strength))) : 0.8;
     ctx.stroke();
-    ctx.globalAlpha *= 0.4; ctx.lineWidth *= 2.4; ctx.stroke(); // soft halo
+    ctx.globalAlpha *= 0.4; ctx.lineWidth *= 2.4; ctx.stroke();
   }
   ctx.globalAlpha = 1;
-  if (finish === "tumbled") {
-    for (let i = 0; i < w * h / 40; i++) {
-      ctx.fillStyle = r() > 0.5 ? "rgba(0,0,0,.07)" : "rgba(255,255,255,.1)";
-      ctx.fillRect(x + r() * w, y + r() * h, 1.5, 1.5);
+}
+function drawBands(ctx, x, y, w, h, stone, r) {
+  const n = Math.max(4, Math.round(h / 9));
+  ctx.strokeStyle = stone.vein; ctx.lineCap = "round";
+  for (let i = 0; i < n; i++) {
+    const yy = y + (i + r()) * h / n;
+    ctx.globalAlpha = 0.12 + r() * 0.28 * (0.5 + stone.strength); ctx.lineWidth = 0.6 + r() * 2.2;
+    ctx.beginPath(); ctx.moveTo(x - 5, yy);
+    for (let k = 1; k <= 6; k++) ctx.quadraticCurveTo(x + (k - 0.5) * w / 6, yy + (r() - 0.5) * 5, x + k * w / 6, yy + (r() - 0.5) * 3);
+    ctx.stroke();
+  }
+  ctx.fillStyle = stone.base2;
+  const pits = Math.min(90, Math.round(w * h / 1100));
+  for (let i = 0; i < pits; i++) { ctx.globalAlpha = 0.25 + r() * 0.3; ctx.beginPath(); ctx.ellipse(x + r() * w, y + r() * h, 1 + r() * 4, 0.5 + r() * 1.2, 0, 0, 7); ctx.fill(); }
+  ctx.globalAlpha = 1;
+}
+function drawSolid(ctx, x, y, w, h, stone, r) {
+  const k = Math.max(1, Math.round(stone.strength * 4));
+  for (let i = 0; i < k; i++) {
+    const cx = x + r() * w, cy = y + r() * h, cr = (0.3 + r() * 0.5) * Math.max(w, h);
+    const rg = ctx.createRadialGradient(cx, cy, 0, cx, cy, cr);
+    rg.addColorStop(0, stone.vein + "66"); rg.addColorStop(1, stone.vein + "00");
+    ctx.fillStyle = rg; ctx.fillRect(x, y, w, h);
+  }
+  const n = Math.min(900, Math.round(w * h / 110 * (0.3 + stone.strength)));
+  for (let i = 0; i < n; i++) { ctx.fillStyle = r() > 0.5 ? "rgba(0,0,0,.07)" : "rgba(255,255,255,.09)"; ctx.fillRect(x + r() * w, y + r() * h, 1.2, 1.2); }
+}
+function drawWood(ctx, x, y, w, h, stone, r) {
+  const ph = Math.max(14, Math.min(w, h) * 0.17);
+  for (let py = y, row = 0; py < y + h; py += ph, row++) {
+    ctx.fillStyle = shade(stone.base, (r() - 0.5) * 26); ctx.fillRect(x, py, w, ph - 1);
+    ctx.strokeStyle = stone.vein;
+    for (let i = 0; i < 7; i++) {
+      const yy = py + r() * ph; ctx.globalAlpha = 0.08 + r() * 0.2; ctx.lineWidth = 0.6 + r();
+      ctx.beginPath(); ctx.moveTo(x, yy); ctx.bezierCurveTo(x + w * 0.3, yy + (r() - 0.5) * 6, x + w * 0.6, yy + (r() - 0.5) * 6, x + w, yy + (r() - 0.5) * 4); ctx.stroke();
+    }
+    ctx.globalAlpha = 1; ctx.fillStyle = "rgba(0,0,0,.28)"; ctx.fillRect(x, py + ph - 1, w, 1);
+    const jx = x + r() * w; ctx.fillRect(jx, py, 1, ph);
+  }
+}
+function drawTerrazzo(ctx, x, y, w, h, stone, r) {
+  const n = Math.min(220, Math.round(w * h / 520)), base = Math.min(w, h);
+  for (let i = 0; i < n; i++) {
+    const cx = x + r() * w, cy = y + r() * h, sz = Math.max(1.5, base * (0.012 + r() * r() * 0.05)), pts = 5 + Math.floor(r() * 3);
+    ctx.fillStyle = stone.chips[Math.floor(r() * stone.chips.length)]; ctx.globalAlpha = 0.95;
+    ctx.beginPath();
+    for (let p = 0; p < pts; p++) { const a = p / pts * 6.283 + r() * 0.5, rr = sz * (0.6 + r() * 0.6); ctx[p ? "lineTo" : "moveTo"](cx + Math.cos(a) * rr, cy + Math.sin(a) * rr * 0.8); }
+    ctx.closePath(); ctx.fill();
+  }
+  ctx.globalAlpha = 1;
+}
+function drawMosaic(ctx, x, y, w, h, stone, r) {
+  ctx.fillStyle = stone.base2; ctx.fillRect(x, y, w, h);
+  const u = Math.max(6, Math.min(w, h) / 9), piece = () => shade(stone.base, (r() - 0.5) * 30);
+  const sh = stone.shape;
+  if (sh === "hex") {
+    const R = u * 0.62, dx = Math.sqrt(3) * R;
+    for (let j = 0; y + j * 1.5 * R < y + h + R; j++) for (let i = -1; x + i * dx < x + w + dx; i++) {
+      const cx = x + i * dx + (j % 2 ? dx / 2 : 0), cy = y + j * 1.5 * R; ctx.fillStyle = piece(); ctx.beginPath();
+      for (let k = 0; k < 6; k++) { const a = Math.PI / 6 + k * Math.PI / 3; ctx[k ? "lineTo" : "moveTo"](cx + Math.cos(a) * R * 0.92, cy + Math.sin(a) * R * 0.92); }
+      ctx.fill();
+    }
+  } else if (sh === "penny") {
+    const d = u * 0.95;
+    for (let j = 0; j * d * 0.9 < h + d; j++) for (let i = -1; i * d < w + d; i++) { ctx.fillStyle = piece(); ctx.beginPath(); ctx.arc(x + i * d + (j % 2 ? d / 2 : 0), y + j * d * 0.9, d * 0.44, 0, 7); ctx.fill(); }
+  } else if (sh === "subway") {
+    const bw = u * 1.7, bh = u * 0.8;
+    for (let j = 0; j * bh < h; j++) for (let i = -1; i * bw < w; i++) { ctx.fillStyle = piece(); ctx.fillRect(x + i * bw + (j % 2 ? bw / 2 : 0) + 1, y + j * bh + 1, bw - 2, bh - 2); }
+  } else if (sh === "herringbone") {
+    const q = u * 0.62;
+    for (let j = -2; y + j * q < y + h + q; j++) for (let i = -2; x + i * q < x + w + q; i++) {
+      const m = (((i - j) % 4) + 4) % 4; ctx.fillStyle = piece();
+      if (m === 0) ctx.fillRect(x + i * q + 0.7, y + j * q + 0.7, 2 * q - 1.4, q - 1.4);
+      else if (m === 3) ctx.fillRect(x + i * q + 0.7, y + j * q + 0.7, q - 1.4, 2 * q - 1.4);
+    }
+  } else { // chevron
+    const cw = u * 0.75, rh = u * 1.1, sk = cw * 1.1;
+    for (let j = -1; j * rh < h + sk; j++) for (let i = 0; i * cw < w; i++) {
+      const x0 = x + i * cw, a = y + j * rh + (i % 2 ? sk : 0), b = y + j * rh + (i % 2 ? 0 : sk);
+      ctx.fillStyle = piece(); ctx.beginPath(); ctx.moveTo(x0 + 0.5, a); ctx.lineTo(x0 + cw - 0.5, b); ctx.lineTo(x0 + cw - 0.5, b + rh - 1.2); ctx.lineTo(x0 + 0.5, a + rh - 1.2); ctx.fill();
     }
   }
-  if (finish === "polished") {
+}
+function drawStone(ctx, x, y, w, h, stone, seed, finish = "polished") {
+  const r = rng(seed), kind = stone.kind || "vein", fin = String(finish).toLowerCase();
+  ctx.save(); ctx.beginPath(); ctx.rect(x, y, w, h); ctx.clip();
+  if (kind === "mosaic") drawMosaic(ctx, x, y, w, h, stone, r);
+  else if (kind === "wood") drawWood(ctx, x, y, w, h, stone, r);
+  else {
+    const g = ctx.createLinearGradient(x, y, x + w, y + h);
+    g.addColorStop(0, stone.base); g.addColorStop(1, stone.base2);
+    ctx.fillStyle = g; ctx.fillRect(x, y, w, h);
+    if (kind === "band") drawBands(ctx, x, y, w, h, stone, r);
+    else if (kind === "solid") drawSolid(ctx, x, y, w, h, stone, r);
+    else if (kind === "terrazzo") drawTerrazzo(ctx, x, y, w, h, stone, r);
+    else drawVeins(ctx, x, y, w, h, stone, r);
+  }
+  const rough = { tumbled: 40, leathered: 22, textured: 26, structured: 26 }[fin];
+  if (rough) for (let i = 0; i < w * h / rough; i++) { ctx.fillStyle = r() > 0.5 ? "rgba(0,0,0,.07)" : "rgba(255,255,255,.1)"; ctx.fillRect(x + r() * w, y + r() * h, 1.5, 1.5); }
+  if (fin === "brushed") { ctx.fillStyle = "rgba(0,0,0,.05)"; for (let yy = y; yy < y + h; yy += 3) ctx.fillRect(x, yy, w, 1); }
+  const gloss = { polished: 0.28, glossy: 0.34, satin: 0.12 }[fin];
+  if (gloss) {
     const sh = ctx.createLinearGradient(x, y, x + w, y + h);
-    sh.addColorStop(0, "rgba(255,255,255,.28)"); sh.addColorStop(0.45, "rgba(255,255,255,0)"); sh.addColorStop(1, "rgba(255,255,255,.1)");
+    sh.addColorStop(0, `rgba(255,255,255,${gloss})`); sh.addColorStop(0.45, "rgba(255,255,255,0)"); sh.addColorStop(1, `rgba(255,255,255,${gloss * 0.35})`);
     ctx.fillStyle = sh; ctx.fillRect(x, y, w, h);
   }
   ctx.restore();
@@ -99,7 +191,7 @@ function drawStone(ctx, x, y, w, h, stone, seed, finish = "polished") {
 function layFloor(ctx, W, H, o) {
   const { stone, pattern, tileIn, ppi, grout, finish, seed, gap = 3 } = o;
   const s = tileIn * ppi, half = gap / 2;
-  const alt = stoneById(stone.pair);
+  const alt = stoneById(stone.pair) || stoneByIdAny(lum(stone.base) > 0.5 ? "nero" : "carrara");
   ctx.fillStyle = grout; ctx.fillRect(0, 0, W, H);
   const tile = (x, y, w, h, st, k) => drawStone(ctx, x + half, y + half, w - gap, h - gap, st, seed + k * 7919, finish);
   if (pattern === "straight") {
@@ -138,8 +230,7 @@ function services() {
   list.innerHTML = SERVICES.map((s, i) => `<li><button type="button" data-i="${i}"><span class="sv-n">${String(i + 1).padStart(2, "0")}</span><span class="sv-t">${s.t}</span><span class="sv-d">${s.d}</span><span class="sv-a" aria-hidden="true">&rarr;</span></button></li>`).join("");
   list.addEventListener("click", e => {
     const b = e.target.closest("button[data-i]"); if (!b) return;
-    $("#eType").value = SERVICES[b.dataset.i].type; syncTypeLabels(); estimate();
-    $("#estimator").scrollIntoView({ behavior: reduceMotion ? "auto" : "smooth" });
+    goToQuote(`I'm interested in: ${SERVICES[b.dataset.i].t}.`);
   });
 }
 
@@ -189,53 +280,16 @@ function visualizer() {
   $("#tileSize").addEventListener("input", e => { state.size = +e.target.value; render(); });
   $("#shuffleBtn").addEventListener("click", () => { state.seedBase = (state.seedBase * 31 + 17) % 9973; render(); });
   $("#useInEstimate").addEventListener("click", () => {
-    $("#eStone").value = state.stone; $("#ePattern").value = state.pattern; estimate();
-    toast("Design applied to estimate"); $("#estimator").scrollIntoView({ behavior: reduceMotion ? "auto" : "smooth" });
+    const st = stoneById(state.stone), p = PATTERNS.find(p => p.id === state.pattern);
+    goToQuote(`I'd like a quote for this layout: ${st.name}, ${p.name.toLowerCase()} layout, ${state.size}" tiles, ${state.finish} finish.`);
   });
   visualizer.refresh = () => { syncs.forEach(f => f()); render(); };
   render();
 }
 
-/* ---------- estimator ---------- */
-function syncTypeLabels() {
-  const t = TYPES[$("#eType").value];
-  $("#eLen").parentElement.firstChild.textContent = t.label[0] + " ";
-  $("#eWid").parentElement.firstChild.textContent = t.label[1] + " ";
-  const stairs = $("#eType").value === "stairs";
-  $("#eUnit").disabled = stairs; if (stairs) $("#eUnit").value = "ft";
-}
-function estimate() {
-  const type = $("#eType").value, T = TYPES[type];
-  const len = Math.max(0, parseFloat($("#eLen").value) || 0), wid = Math.max(0, parseFloat($("#eWid").value) || 0);
-  const k = $("#eUnit").value === "m" ? 3.2808 : 1;
-  let area = type === "stairs" ? len * wid * k * 1.5 : len * k * wid * k;
-  area = Math.round(area * 10) / 10;
-  const stone = stoneById($("#eStone").value), pat = PATTERNS.find(p => p.id === $("#ePattern").value);
-  const own = $("#eSupply").value === "you";
-  const stoneCost = own ? 0 : area * (1 + pat.waste) * stone.mat;
-  const labor = area * pat.labor * T.mult;
-  const extras = area * ($("#eDemo").checked * 4 + $("#eLevel").checked * 3.5 + $("#eWater").checked * 3 + $("#eSeal").checked * 1.8 + $("#eHeat").checked * 12);
-  let total = stoneCost + labor + extras;
-  const minimum = area > 0 && total < 450; if (minimum) total = 450;
-  const lo = total * 0.88, hi = total * 1.12;
-  state.estimate = area > 0 ? { total, lo, hi, area, type, stone: stone.name, pattern: pat.name } : null;
-  $("#estTotal").textContent = area > 0 ? money(Math.round(total / 10) * 10) : "—";
-  $("#estRange").textContent = area > 0 ? `Likely range ${money(Math.round(lo / 10) * 10)} – ${money(Math.round(hi / 10) * 10)}` : "Enter your measurements";
-  const parts = [["Stone (incl. " + Math.round(pat.waste * 100) + "% waste)", stoneCost, "#d3b06a"], ["Installation labour", labor, "#8fb7a3"], ["Prep & extras", extras, "#9aa5c4"]];
-  const sum = parts.reduce((a, p) => a + p[1], 0) || 1;
-  $("#estBar").innerHTML = parts.map(p => `<i style="width:${p[1] / sum * 100}%;background:${p[2]}"></i>`).join("");
-  $("#estBreak").innerHTML = (area > 0 ? parts : []).map(p => `<li style="--c:${p[2]}"><span>${p[0]}</span><span>${money(Math.round(p[1]))}</span></li>`).join("");
-  $("#estNote").textContent = area > 0 ? `${area} sq ft of surface.${minimum ? " Minimum job charge applied." : ""} Estimate only — excludes tax, structural repairs and unforeseen conditions.` : "";
-  renderSummary();
-}
-function estimator() {
-  $("#eStone").innerHTML = STONES.map(s => `<option value="${s.id}">${s.name} — ${money(s.mat)}/sq ft</option>`).join("");
-  $("#ePattern").innerHTML = PATTERNS.map(p => `<option value="${p.id}">${p.name}</option>`).join("");
-  $("#ePattern").value = state.pattern;
-  $("#estForm").addEventListener("input", () => { syncTypeLabels(); estimate(); });
-  $("#estForm").addEventListener("submit", e => e.preventDefault());
-  $("#estToQuote").addEventListener("click", () => { $("#quote").scrollIntoView({ behavior: reduceMotion ? "auto" : "smooth" }); setTimeout(() => $("#qName").focus({ preventScroll: true }), 500); });
-  syncTypeLabels(); estimate();
+function goToQuote(msg) {
+  if (msg) { const m = $("#qMsg"); m.value = m.value && !m.value.includes(msg) ? m.value + "\n" + msg : msg; }
+  $("#quote").scrollIntoView({ behavior: reduceMotion ? "auto" : "smooth" });
 }
 
 /* ---------- gallery ---------- */
@@ -349,10 +403,10 @@ function faq() {
 
 /* ---------- quote form ---------- */
 function renderSummary() {
-  const s = stoneById(state.stone), p = PATTERNS.find(p => p.id === state.pattern), e = state.estimate;
   const el = $("#quoteSummary"); if (!el) return;
-  el.innerHTML = `<div><span>Design</span><span>${s.name} · ${p.name} · ${state.finish}</span></div>` +
-    (e ? `<div><span>Estimate</span><span>${money(Math.round(e.lo / 10) * 10)} – ${money(Math.round(e.hi / 10) * 10)}</span></div><div><span>Area</span><span>${e.area} sq ft (${e.type})</span></div>` : "");
+  const s = stoneById(state.stone), p = PATTERNS.find(p => p.id === state.pattern), sel = selectionsList();
+  el.innerHTML = `<div><span>Layout preview</span><span>${s.name} · ${p.name} · ${state.finish}</span></div>` +
+    `<div><span>Saved selections</span><span>${sel.length ? sel.map(i => i.name).join(", ") : "None yet"}</span></div>`;
 }
 const VALID = {
   qName: v => v.trim().length >= 2 || "Please enter your name",
@@ -376,10 +430,10 @@ function quoteForm() {
     e.preventDefault();
     const ok = Object.keys(VALID).map(check).every(Boolean);
     if (!ok) { $(".bad", form)?.focus(); return; }
-    const s = stoneById(state.stone), est = state.estimate;
-    const rec = { at: Date.now(), name: $("#qName").value.trim(), phone: $("#qPhone").value, email: $("#qEmail").value, zip: $("#qZip").value, when: $("#qWhen").value, msg: $("#qMsg").value, design: `${s.name} ${state.pattern}`, estimate: est ? `${money(Math.round(est.lo / 10) * 10)}–${money(Math.round(est.hi / 10) * 10)}` : "n/a" };
+    const s = stoneById(state.stone), sel = selectionsList();
+    const rec = { at: Date.now(), name: $("#qName").value.trim(), phone: $("#qPhone").value, email: $("#qEmail").value, zip: $("#qZip").value, when: $("#qWhen").value, msg: $("#qMsg").value, design: sel.length ? `${sel.length} saved selection${sel.length > 1 ? "s" : ""}` : `${s.name} ${state.pattern}` };
     const list = store.get("wms-requests", []); list.unshift(rec); store.set("wms-requests", list.slice(0, 10)); drawSaved();
-    const body = `Name: ${rec.name}\nPhone: ${rec.phone}\nEmail: ${rec.email}\nZIP: ${rec.zip}\nStart: ${rec.when}\nDesign: ${s.name}, ${state.pattern}, ${state.size}" tiles, ${state.finish}, grout ${state.grout}\nEstimate: ${rec.estimate}${est ? ` (${est.area} sq ft ${est.type})` : ""}\nPhotos to follow: ${$("#qPhotos").checked ? "yes" : "no"}\n\n${rec.msg}`;
+    const body = `Name: ${rec.name}\nPhone: ${rec.phone}\nEmail: ${rec.email}\nZIP: ${rec.zip}\nStart: ${rec.when}\nDesign: ${s.name}, ${state.pattern}, ${state.size}" tiles, ${state.finish}, grout ${state.grout}\nSaved selections: ${sel.length ? sel.map(i => `${i.name} (${i.finish})`).join("; ") : "none"}\nPhotos to follow: ${$("#qPhotos").checked ? "yes" : "no"}\n\n${rec.msg}`;
     const href = `mailto:${CONFIG.email}?subject=${encodeURIComponent("Quote request — " + rec.name)}&body=${encodeURIComponent(body)}`;
     $("#formStatus").innerHTML = `Thanks, ${rec.name.split(" ")[0]} — request saved on this device. <a href="${href}" style="color:#d3b06a">Click here to email it to us</a> to send it.`;
     form.reset(); toast("Request saved");
@@ -397,4 +451,4 @@ function page() {
   $$(".section .wrap > *, .reveal").forEach(el => { el.classList.add("reveal"); io.observe(el); });
 }
 
-services(); visualizer(); estimator(); gallery(); process(); faq(); quoteForm(); page();
+services(); visualizer(); gallery(); process(); faq(); quoteForm(); page();

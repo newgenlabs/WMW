@@ -19,9 +19,9 @@
   <button class="nav-toggle" aria-expanded="false" aria-controls="nav" aria-label="Menu"><span></span><span></span></button>
   <nav id="nav" class="nav">
     <a href="#work">Work</a>
+    <a href="#collection">Collection</a>
     <a href="#services">Services</a>
     <a href="#visualizer">Visualizer</a>
-    <a href="#estimator">Estimator</a>
     <a href="#process">Process</a>
     <a href="#faq">FAQ</a>
     <a href="#quote" class="nav-cta">Request a Quote</a>
@@ -63,20 +63,52 @@
     </div>
   </section>
 
-  <section id="services" class="section tinted">
+  <section id="collection" class="section tinted">
+    <div class="wrap">
+      <div class="section-head">
+        <div>
+          <p class="eyebrow">Stone &amp; tile collection</p>
+          <h2>Browse materials</h2>
+        </div>
+        <p class="sub">Filter by material, colour, finish and application. Save your favourites and send them with your quote request.</p>
+      </div>
+      <div class="coll-tabs" role="tablist" aria-label="Collection type">
+        <button type="button" class="coll-tab" role="tab" data-g="All" aria-selected="true">All</button>
+        <button type="button" class="coll-tab" role="tab" data-g="Natural stone" aria-selected="false">Natural stone</button>
+        <button type="button" class="coll-tab" role="tab" data-g="Tile" aria-selected="false">Tile</button>
+      </div>
+      <div class="coll">
+        <aside class="coll-filters" id="collFilters" aria-label="Filters"></aside>
+        <div class="coll-main">
+          <div class="coll-bar">
+            <input id="collSearch" type="search" placeholder="Search by name, colour, finish or origin" aria-label="Search the collection">
+            <select id="collSort" aria-label="Sort">
+              <option value="az">Name A-Z</option><option value="za">Name Z-A</option><option value="light">Lightest first</option><option value="dark">Darkest first</option><option value="mat">By material</option>
+            </select>
+            <button type="button" class="btn btn-ghost" id="collFilterToggle" aria-expanded="false">Filters</button>
+          </div>
+          <div class="coll-meta"><span id="collCount" class="fine"></span><div id="collChips" class="coll-chips"></div></div>
+          <div class="coll-grid" id="collGrid"></div>
+          <div class="coll-more"><button type="button" class="btn btn-ghost" id="collMore">Show more</button></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section id="services" class="section">
     <div class="wrap">
       <div class="section-head">
         <div>
           <p class="eyebrow">Services</p>
           <h2>What we install</h2>
         </div>
-        <p class="sub">Select a service to price it in the estimator.</p>
+        <p class="sub">Select a service to start a quote request.</p>
       </div>
       <ol class="service-list" id="serviceList"></ol>
     </div>
   </section>
 
-  <section id="visualizer" class="section">
+  <section id="visualizer" class="section tinted">
     <div class="wrap">
       <div class="section-head">
         <div>
@@ -110,70 +142,13 @@
           </fieldset>
           <div class="viz-actions">
             <button class="btn btn-ghost" id="shuffleBtn" type="button">Shuffle veining</button>
-            <button class="btn" id="useInEstimate" type="button">Use in estimate</button>
+            <button class="btn" id="useInEstimate" type="button">Request this layout</button>
           </div>
         </div>
         <div class="viz-stage">
           <canvas id="vizCanvas" width="900" height="600" role="img" aria-label="Floor pattern preview"></canvas>
           <p class="viz-caption" id="vizCaption"></p>
         </div>
-      </div>
-    </div>
-  </section>
-
-  <section id="estimator" class="section tinted">
-    <div class="wrap">
-      <div class="section-head">
-        <div>
-          <p class="eyebrow">Estimator</p>
-          <h2>Get a ballpark estimate</h2>
-        </div>
-        <p class="sub">Based on typical rates. Final pricing follows an on-site measure.</p>
-      </div>
-      <div class="est">
-        <form id="estForm" class="est-form" novalidate>
-          <div class="grid2">
-            <label>Project type
-              <select id="eType">
-                <option value="floor">Floor</option>
-                <option value="wall">Wall / backsplash</option>
-                <option value="shower">Shower surround</option>
-                <option value="stairs">Stairs (per step)</option>
-              </select>
-            </label>
-            <label>Units
-              <select id="eUnit"><option value="ft">Feet</option><option value="m">Metres</option></select>
-            </label>
-            <label>Length <input type="number" id="eLen" min="0.5" step="0.1" value="12" inputmode="decimal"></label>
-            <label>Width / height <input type="number" id="eWid" min="0.5" step="0.1" value="10" inputmode="decimal"></label>
-            <label>Stone
-              <select id="eStone"></select>
-            </label>
-            <label>Layout
-              <select id="ePattern"></select>
-            </label>
-          </div>
-          <fieldset class="checks">
-            <legend>Extras</legend>
-            <label><input type="checkbox" id="eDemo"> Remove existing surface</label>
-            <label><input type="checkbox" id="eLevel"> Subfloor levelling</label>
-            <label><input type="checkbox" id="eWater"> Waterproofing membrane</label>
-            <label><input type="checkbox" id="eSeal" checked> Sealing</label>
-            <label><input type="checkbox" id="eHeat"> Radiant heat mat</label>
-          </fieldset>
-          <label>Materials supplied by
-            <select id="eSupply"><option value="us">Whitestone (stone + install)</option><option value="you">Customer (install only)</option></select>
-          </label>
-        </form>
-        <aside class="est-result" aria-live="polite">
-          <p class="est-label">Estimated total</p>
-          <p class="est-total" id="estTotal">&mdash;</p>
-          <p class="est-range" id="estRange"></p>
-          <div class="bar" id="estBar" aria-hidden="true"></div>
-          <ul class="breakdown" id="estBreak"></ul>
-          <p class="fine" id="estNote"></p>
-          <button class="btn btn-light" id="estToQuote" type="button">Request this quote</button>
-        </aside>
       </div>
     </div>
   </section>
@@ -209,7 +184,7 @@
       <div>
         <p class="eyebrow">Request a quote</p>
         <h2>Tell us about your project</h2>
-        <p class="sub">Share a few details and we will follow up to arrange a site visit. Your layout choices and estimate are included automatically.</p>
+        <p class="sub">Share a few details and we will follow up to arrange a site visit. Your saved selections and layout choices are included automatically.</p>
         <div class="summary" id="quoteSummary"></div>
         <h3 class="saved-title">Your saved requests</h3>
         <ul class="saved" id="savedList"></ul>
@@ -239,12 +214,14 @@
   <div class="wrap foot">
     <div class="foot-brand"><span class="brand-name">Whitestone</span><span class="brand-sub">Marble Setters</span></div>
     <div><p class="foot-h">Contact</p><p><span id="ftPhone"></span><br><span id="ftEmail"></span></p></div>
-    <div><p class="foot-h">Explore</p><p><a href="#work">Work</a><br><a href="#services">Services</a><br><a href="#quote">Request a quote</a></p></div>
+    <div><p class="foot-h">Explore</p><p><a href="#work">Work</a><br><a href="#collection">Collection</a><br><a href="#services">Services</a><br><a href="#quote">Request a quote</a></p></div>
   </div>
   <p class="copy">&copy; <span id="yr"></span> Whitestone Marble Setters</p>
 </footer>
 
 <div class="toast" id="toast" role="status" aria-live="polite"></div>
+<script src="catalog.js"></script>
 <script src="app.js"></script>
+<script src="collection.js"></script>
 </body>
 </html>
