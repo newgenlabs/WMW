@@ -2,16 +2,16 @@
 /* Home page behaviour: services, layout visualizer, process, FAQ, quote form. */
 /* ---------- services ---------- */
 const SERVICES = [
-  { t: "Floors", d: "Entries, kitchens, lobbies and living areas: flat, flush and lippage-free.", type: "floor" },
-  { t: "Showers and baths", d: "Slab and tile surrounds, waterproofed, sloped and sealed.", type: "shower" },
-  { t: "Stairs and thresholds", d: "Precisely cut treads, risers, nosings and inlay borders.", type: "stairs" },
-  { t: "Walls and backsplashes", d: "Book-matched slabs, mosaics and feature walls.", type: "wall" },
-  { t: "Countertops and islands", d: "Waterfall edges, mitred returns and vein-matched seams.", type: "wall" },
-  { t: "Restoration", d: "Honing, polishing, re-grouting and stain removal.", type: "floor" }
+  { t: "Floors", d: "Entries, kitchens, lobbies and living areas: flat, flush and lippage-free.", img: 12 },
+  { t: "Showers and baths", d: "Slab and tile surrounds, waterproofed, sloped and sealed.", img: 6 },
+  { t: "Stairs and thresholds", d: "Precisely cut treads, risers, nosings and inlay borders.", img: 11 },
+  { t: "Walls and backsplashes", d: "Book-matched slabs, mosaics and feature walls.", img: 13 },
+  { t: "Countertops and islands", d: "Waterfall edges, mitred returns and vein-matched seams.", img: 16 },
+  { t: "Custom stonework", d: "Ledges, inlays, bar tops and one-off architectural pieces.", img: 4 }
 ];
 function services() {
   const list = $("#serviceList");
-  list.innerHTML = SERVICES.map((s, i) => `<li><button type="button" data-i="${i}"><span class="sv-n">${String(i + 1).padStart(2, "0")}</span><span class="sv-t">${s.t}</span><span class="sv-d">${s.d}</span><span class="sv-a" aria-hidden="true">&rarr;</span></button></li>`).join("");
+  list.innerHTML = SERVICES.map((s, i) => `<li><button type="button" class="svc" data-i="${i}"><img src="images/project-${String(s.img).padStart(2, "0")}-thumb.jpg" alt="" loading="lazy"><span class="svc-txt"><b>${s.t}</b><small>${s.d}</small></span><span class="svc-go" aria-hidden="true">&rarr;</span></button></li>`).join("");
   list.addEventListener("click", e => {
     const b = e.target.closest("button[data-i]"); if (!b) return;
     goToQuote(`I'm interested in: ${SERVICES[b.dataset.i].t}.`);
