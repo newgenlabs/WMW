@@ -456,7 +456,6 @@ h1{font-size:clamp(2.8rem,6vw,5rem)}
 h2{font-size:clamp(2rem,4vw,3.3rem)}
 h3{font-size:1.3rem;letter-spacing:-.02em}
 .eyebrow{font:700 .72rem var(--sans);letter-spacing:.06em;text-transform:uppercase;color:var(--ink);margin-bottom:1.1rem}
-.eyebrow::before{content:"/";margin-right:2px}
 .dark .eyebrow,.tour-cap .eyebrow{color:#fff}
 .sub{font-size:.9rem;line-height:1.6}
 .section-head{align-items:flex-start}
@@ -465,7 +464,6 @@ h3{font-size:1.3rem;letter-spacing:-.02em}
 /* header */
 .site-header{background:rgba(255,255,255,.92);box-shadow:0 1px 0 var(--line);padding:0 32px}
 .brand-name{font:800 1.3rem var(--sans);letter-spacing:-.04em;text-transform:none}
-.brand-name::before{content:"/"}
 .brand-sub{font:500 .62rem var(--sans);letter-spacing:.02em;text-transform:none;color:var(--muted);margin-top:3px}
 .nav{flex:1;gap:28px}
 .nav a{font:500 .85rem var(--sans);letter-spacing:0;text-transform:none}
