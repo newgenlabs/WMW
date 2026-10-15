@@ -53,8 +53,7 @@
   }
   capEl.addEventListener("click", e => {
     const b = e.target.closest("[data-s]"); if (!b) return;
-    const q = $("#collSearch"); if (q) { q.value = b.dataset.s; q.dispatchEvent(new Event("input", { bubbles: true })); }
-    $("#collection").scrollIntoView({ behavior: reduce ? "auto" : "smooth" });
+    location.href = "collection.html?q=" + encodeURIComponent(b.dataset.s);
   });
   const setPlayIcon = () => { playBtn.setAttribute("aria-label", playing ? "Pause tour" : "Play tour"); playBtn.classList.toggle("paused", !playing); };
   function seek(s) { T = Math.max(0, Math.min(DUR, s)); if (mode === "video") video.currentTime = T; else drawNow(); sync(); }

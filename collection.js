@@ -26,7 +26,7 @@
     const n = getSel().length; fab.hidden = n === 0; $("#selCount").textContent = n;
     $$(".pc-save").forEach(b => { const on = isSaved(b.dataset.id); b.setAttribute("aria-pressed", on); b.textContent = on ? "Saved" : "Save"; });
     const pvSave = $("[data-a=save]", pv); if (pvSave && pv.open) pvSave.textContent = isSaved(pvState.id) ? "Remove from selections" : "Save to selections";
-    renderSummary();
+    if (typeof renderSummary === "function") renderSummary();
     if (selDlg.open) drawSelDialog();
   }
 
@@ -184,5 +184,6 @@
     const id = e.target.closest("li").dataset.id; setSel(getSel().map(x => x.id === id ? { ...x, finish: e.target.value } : x));
   });
 
+  const q0 = new URLSearchParams(location.search).get("q"); if (q0) { f.q = q0.trim(); $("#collSearch").value = f.q; }
   render(true); refreshSel();
 })();

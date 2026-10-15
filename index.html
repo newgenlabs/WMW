@@ -19,7 +19,7 @@
   <button class="nav-toggle" aria-expanded="false" aria-controls="nav" aria-label="Menu"><span></span><span></span></button>
   <nav id="nav" class="nav">
     <a href="gallery.html">Gallery</a>
-    <a href="#collection">Collection</a>
+    <a href="collection.html">Collection</a>
     <a href="#services">Services</a>
     <a href="#visualizer">Visualizer</a>
     <a href="#process">Process</a>
@@ -68,39 +68,7 @@
     </div>
   </section>
 
-  <section id="collection" class="section tinted">
-    <div class="wrap">
-      <div class="section-head">
-        <div>
-          <p class="eyebrow">Stone &amp; tile collection</p>
-          <h2>Browse materials</h2>
-        </div>
-        <p class="sub">Filter by material, colour, finish and application. Save your favourites and send them with your quote request.</p>
-      </div>
-      <div class="coll-tabs" role="tablist" aria-label="Collection type">
-        <button type="button" class="coll-tab" role="tab" data-g="All" aria-selected="true">All</button>
-        <button type="button" class="coll-tab" role="tab" data-g="Natural stone" aria-selected="false">Natural stone</button>
-        <button type="button" class="coll-tab" role="tab" data-g="Tile" aria-selected="false">Tile</button>
-      </div>
-      <div class="coll">
-        <aside class="coll-filters" id="collFilters" aria-label="Filters"></aside>
-        <div class="coll-main">
-          <div class="coll-bar">
-            <input id="collSearch" type="search" placeholder="Search by name, colour, finish or origin" aria-label="Search the collection">
-            <select id="collSort" aria-label="Sort">
-              <option value="az">Name A-Z</option><option value="za">Name Z-A</option><option value="light">Lightest first</option><option value="dark">Darkest first</option><option value="mat">By material</option>
-            </select>
-            <button type="button" class="btn btn-ghost" id="collFilterToggle" aria-expanded="false">Filters</button>
-          </div>
-          <div class="coll-meta"><span id="collCount" class="fine"></span><div id="collChips" class="coll-chips"></div></div>
-          <div class="coll-grid" id="collGrid"></div>
-          <div class="coll-more"><button type="button" class="btn btn-ghost" id="collMore">Show more</button></div>
-        </div>
-      </div>
-    </div>
-  </section>
-
-  <section id="services" class="section">
+  <section id="services" class="section tinted">
     <div class="wrap">
       <div class="section-head">
         <div>
@@ -113,7 +81,7 @@
     </div>
   </section>
 
-  <section id="visualizer" class="section tinted">
+  <section id="visualizer" class="section">
     <div class="wrap">
       <div class="section-head">
         <div>
@@ -158,7 +126,7 @@
     </div>
   </section>
 
-  <section id="process" class="section">
+  <section id="process" class="section tinted">
     <div class="wrap">
       <div class="section-head">
         <div>
@@ -173,7 +141,7 @@
     </div>
   </section>
 
-  <section id="faq" class="section tinted">
+  <section id="faq" class="section">
     <div class="wrap faq-wrap">
       <div>
         <p class="eyebrow">Questions</p>
@@ -219,7 +187,7 @@
   <div class="wrap foot">
     <div class="foot-brand"><span class="brand-name">Whitestone</span><span class="brand-sub">Marble Setters</span></div>
     <div><p class="foot-h">Contact</p><p><span id="ftPhone"></span><br><span id="ftEmail"></span></p></div>
-    <div><p class="foot-h">Explore</p><p><a href="gallery.html">Gallery</a><br><a href="#collection">Collection</a><br><a href="#services">Services</a><br><a href="#quote">Request a quote</a></p></div>
+    <div><p class="foot-h">Explore</p><p><a href="gallery.html">Gallery</a><br><a href="collection.html">Collection</a><br><a href="#services">Services</a><br><a href="#quote">Request a quote</a></p></div>
   </div>
   <p class="copy">&copy; <span id="yr"></span> Whitestone Marble Setters</p>
 </footer>
@@ -227,8 +195,8 @@
 <div class="toast" id="toast" role="status" aria-live="polite"></div>
 <script src="config.js"></script>
 <script src="catalog.js"></script>
+<script src="core.js"></script>
 <script src="app.js"></script>
-<script src="collection.js"></script>
 <script src="vendor/three.min.js"></script>
 <script src="tour-world.js"></script>
 <script src="tour.js"></script>

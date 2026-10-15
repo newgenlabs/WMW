@@ -1,0 +1,85 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Collection | Whitestone Marble Setters</title>
+<meta name="description" content="Browse marble, quartzite, limestone, travertine, granite, porcelain, ceramic and mosaic tile by material, colour, finish and application.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="styles.css">
+</head>
+<body class="page-collection">
+
+<header class="site-header" id="header">
+  <a class="brand" href="index.html" aria-label="Whitestone Marble Setters home">
+    <span class="brand-name">Whitestone</span><span class="brand-sub">Marble Setters</span>
+  </a>
+  <button class="nav-toggle" aria-expanded="false" aria-controls="nav" aria-label="Menu"><span></span><span></span></button>
+  <nav id="nav" class="nav">
+    <a href="gallery.html">Gallery</a>
+    <a href="collection.html" class="current" aria-current="page">Collection</a>
+    <a href="index.html#services">Services</a>
+    <a href="index.html#visualizer">Visualizer</a>
+    <a href="index.html#process">Process</a>
+    <a href="index.html#faq">FAQ</a>
+    <a href="index.html#quote" class="nav-cta">Request a Quote</a>
+  </nav>
+</header>
+
+<main>
+  <section class="gal-hero">
+    <div class="wrap">
+      <p class="eyebrow">Stone &amp; tile collection</p>
+      <h1>Browse materials</h1>
+      <p class="lead">Filter by material, colour, finish and application. Save your favourites and send them with your quote request.</p>
+    </div>
+  </section>
+
+  <section id="collection" class="section tinted">
+    <div class="wrap">
+      <div class="coll-tabs" role="tablist" aria-label="Collection type">
+        <button type="button" class="coll-tab" role="tab" data-g="All" aria-selected="true">All</button>
+        <button type="button" class="coll-tab" role="tab" data-g="Natural stone" aria-selected="false">Natural stone</button>
+        <button type="button" class="coll-tab" role="tab" data-g="Tile" aria-selected="false">Tile</button>
+      </div>
+      <div class="coll">
+        <aside class="coll-filters" id="collFilters" aria-label="Filters"></aside>
+        <div class="coll-main">
+          <div class="coll-bar">
+            <input id="collSearch" type="search" placeholder="Search by name, colour, finish or origin" aria-label="Search the collection">
+            <select id="collSort" aria-label="Sort">
+              <option value="az">Name A-Z</option><option value="za">Name Z-A</option><option value="light">Lightest first</option><option value="dark">Darkest first</option><option value="mat">By material</option>
+            </select>
+            <button type="button" class="btn btn-ghost" id="collFilterToggle" aria-expanded="false">Filters</button>
+          </div>
+          <div class="coll-meta"><span id="collCount" class="fine"></span><div id="collChips" class="coll-chips"></div></div>
+          <div class="coll-grid" id="collGrid"></div>
+          <div class="coll-more"><button type="button" class="btn btn-ghost" id="collMore">Show more</button></div>
+        </div>
+      </div>
+    </div>
+  </section>
+</main>
+
+<footer class="site-footer">
+  <div class="wrap foot">
+    <div class="foot-brand"><span class="brand-name">Whitestone</span><span class="brand-sub">Marble Setters</span></div>
+    <div><p class="foot-h">Contact</p><p><span id="ftPhone"></span><br><span id="ftEmail"></span></p></div>
+    <div><p class="foot-h">Explore</p><p><a href="gallery.html">Gallery</a><br><a href="collection.html">Collection</a><br><a href="index.html#services">Services</a><br><a href="index.html#quote">Request a quote</a></p></div>
+  </div>
+  <p class="copy">&copy; <span id="yr"></span> Whitestone Marble Setters</p>
+</footer>
+
+<div class="toast" id="toast" role="status" aria-live="polite"></div>
+<script src="config.js"></script>
+<script src="catalog.js"></script>
+<script src="core.js"></script>
+<script src="collection.js"></script>
+<script>
+  document.getElementById("ftPhone").textContent = CONFIG.phone; document.getElementById("ftEmail").textContent = CONFIG.email; document.getElementById("yr").textContent = new Date().getFullYear();
+  (function () { const t = document.querySelector(".nav-toggle"), n = document.getElementById("nav"); t.addEventListener("click", () => { const o = n.classList.toggle("open"); t.setAttribute("aria-expanded", o); }); })();
+</script>
+</body>
+</html>
