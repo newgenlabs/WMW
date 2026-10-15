@@ -29,22 +29,40 @@
 </header>
 
 <main id="top">
-  <section class="hero">
-    <div class="hero-copy">
-      <p class="eyebrow">Marble &middot; Stone &middot; Tile</p>
-      <h1>Stone, set with precision.</h1>
-      <p class="lead">Whitestone Marble Setters installs floors, walls, showers, countertops and custom stonework for residential and commercial projects.</p>
-      <div class="hero-cta">
-        <a href="gallery.html" class="btn">View our work</a>
-        <a href="#quote" class="link-arrow">Request a quote</a>
+  <section class="tour" id="tour" tabindex="0" aria-label="Penthouse walkthrough">
+    <canvas id="tourCanvas" aria-hidden="true"></canvas>
+    <div class="tour-fade" id="tourFade"></div>
+
+    <div class="tour-ui" id="tourUi" hidden>
+      <p class="tour-label">Illustrative 3D rendering</p>
+      <div class="tour-cap" id="tourCap" aria-live="polite"></div>
+      <p class="tour-hint" id="tourHint">Drag to look around</p>
+      <div class="tour-bar">
+        <div class="tour-row">
+          <button type="button" class="tbtn" id="tourPlay" aria-label="Pause tour"><svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true"><path class="i-pause" d="M7 5h4v14H7zM13 5h4v14h-4z"/><path class="i-play" d="M8 5v14l11-7z"/></svg></button>
+          <div class="tour-track"><input type="range" id="tourRange" min="0" max="1000" value="0" aria-label="Tour timeline"><div class="tour-ticks" id="tourTicks" aria-hidden="true"></div></div>
+          <span class="tour-time" id="tourTime">0:00 / 1:10</span>
+          <button type="button" class="tbtn" id="tourFs" aria-label="Toggle full screen"><svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true"><path d="M4 9V4h5v2H6v3zm10-5h5v5h-2V6h-3zM4 15h2v3h3v2H4zm13 3v-3h2v5h-5v-2z"/></svg></button>
+        </div>
+        <div class="tour-row tour-row2">
+          <div class="tour-pills" id="tourPills" role="group" aria-label="Tour chapters"></div>
+          <a href="#intro" class="link-arrow tour-skip" id="tourSkip">Explore the site</a>
+        </div>
       </div>
     </div>
-    <figure class="hero-img">
-      <img src="images/project-06.jpg" alt="Marble slab shower with chevron mosaic floor and glass enclosure" fetchpriority="high">
-    </figure>
+
+    <div class="doors" id="doors">
+      <div class="door l"></div><div class="door r"></div>
+      <div class="doors-copy">
+        <p class="eyebrow">Marble &middot; Stone &middot; Tile</p>
+        <h1>Stone, set with precision.</h1>
+        <p class="lead">Step inside a New York penthouse and fly through the finished work: stone counters, tile floors and spa bathrooms.</p>
+        <div class="hero-cta"><button type="button" class="btn" id="enterBtn">Enter the penthouse tour</button><a href="gallery.html" class="link-arrow">View our gallery</a></div>
+      </div>
+    </div>
   </section>
 
-  <section class="intro">
+  <section class="intro" id="intro">
     <div class="wrap">
       <p class="intro-text">From a single shower to a full building lobby, we focus on the details that decide how stone looks for decades: flat substrates, matched veining, tight joints and clean mitres.</p>
     </div>
@@ -211,5 +229,8 @@
 <script src="catalog.js"></script>
 <script src="app.js"></script>
 <script src="collection.js"></script>
+<script src="vendor/three.min.js"></script>
+<script src="tour-world.js"></script>
+<script src="tour.js"></script>
 </body>
 </html>
