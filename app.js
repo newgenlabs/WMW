@@ -55,7 +55,7 @@ function visualizer() {
   const R = (...a) => syncs.push(radio(...a));
   R($("#stoneSwatches"), STONES, () => state.stone, (b, s) => {
     const c = document.createElement("canvas"); c.width = 90; c.height = 56;
-    drawStone(c.getContext("2d"), 0, 0, 90, 56, s, 3 + s.name.length);
+    const paint = () => drawStone(c.getContext("2d"), 0, 0, 90, 56, s, 3 + s.name.length); paint(); onStoneImages(paint);
     b.append(c, s.name); b.setAttribute("aria-label", s.name);
   }, id => { state.stone = id; render(); });
   R($("#patternSeg"), PATTERNS, () => state.pattern, (b, p) => b.textContent = p.name, id => { state.pattern = id; render(); });
@@ -67,6 +67,7 @@ function visualizer() {
     const st = stoneById(state.stone), p = PATTERNS.find(p => p.id === state.pattern);
     goToQuote(`I'd like a quote for this layout: ${st.name}, ${p.name.toLowerCase()} layout, ${state.size}" tiles, ${state.finish} finish.`);
   });
+  onStoneImages(render);
   visualizer.refresh = () => { syncs.forEach(f => f()); render(); };
   render();
 }

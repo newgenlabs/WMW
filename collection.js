@@ -185,5 +185,6 @@
   });
 
   const q0 = new URLSearchParams(location.search).get("q"); if (q0) { f.q = q0.trim(); $("#collSearch").value = f.q; }
+  onStoneImages(() => { render(); if (pv.open) drawPV(); });
   render(true); refreshSel();
 })();

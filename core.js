@@ -19,14 +19,9 @@ function toast(msg) {
 }
 
 /* ---------- data ---------- */
-const STONES = [
-  { id: "carrara",   name: "Carrara",        base: "#eceae6", base2: "#d9d6d0", vein: "#8d9099", strength: 0.5, mat: 14, note: "Soft grey veining on a white-grey ground. The classic.", pair: "nero" },
-  { id: "calacatta", name: "Calacatta",      base: "#f6f4ef", base2: "#e8e3d8", vein: "#6c5e4a", strength: 0.9, mat: 40, note: "Bright white with bold, dramatic veins. Statement stone.", pair: "nero" },
-  { id: "nero",      name: "Nero Marquina",  base: "#1c1c1e", base2: "#2b2b2e", vein: "#f1efe9", strength: 0.55, mat: 30, note: "Deep black with fine white veining.", pair: "carrara" },
-  { id: "emperador", name: "Emperador",      base: "#7a5a43", base2: "#5f432f", vein: "#d8c4a4", strength: 0.6, mat: 19, note: "Warm brown with cream fractures.", pair: "travertine" },
-  { id: "travertine",name: "Travertine",     base: "#dccdb2", base2: "#cbb998", vein: "#a8946f", strength: 0.35, mat: 15, note: "Warm, earthy and naturally textured.", pair: "emperador" },
-  { id: "verde",     name: "Verde Alpi",     base: "#2f4a3f", base2: "#223a31", vein: "#c9d6cc", strength: 0.7, mat: 34, note: "Rich green with white mineral veins.", pair: "carrara" }
-];
+/* The visualizer uses stones that have real photographs (see catalog.js). */
+const STONE_IDS = ["carrara", "calacatta", "statuario", "arabescato", "emperador", "t-grey"];
+const STONES = STONE_IDS.map(id => stoneByIdAny(id));
 const stoneById = id => STONES.find(s => s.id === id) || stoneByIdAny(id);
 
 const PATTERNS = [
@@ -39,7 +34,7 @@ const PATTERNS = [
 const GROUTS = [{ id: "#d8d4cc", name: "Light" }, { id: "#9c978d", name: "Grey" }, { id: "#3b3a38", name: "Charcoal" }, { id: "#c4b08a", name: "Sand" }];
 const FINISHES = [{ id: "polished", name: "Polished" }, { id: "honed", name: "Honed" }, { id: "tumbled", name: "Tumbled" }];
 
-const state = { stone: "carrara", pattern: "herringbone", size: 12, grout: GROUTS[0].id, finish: "polished", seedBase: 7 };
+const state = { stone: "carrara", pattern: "straight", size: 12, grout: GROUTS[0].id, finish: "polished", seedBase: 7 };
 
 /* ---------- procedural marble ---------- */
 function rng(seed) { // mulberry32
@@ -160,10 +155,33 @@ function drawMosaic(ctx, x, y, w, h, stone, r) {
     }
   }
 }
+/* Real stone photographs (cropped from installed projects). Loaded once; subscribers are told to redraw when they arrive. */
+const stoneImgs = {}, stoneImgWatchers = [];
+function onStoneImages(cb) { stoneImgWatchers.push(cb); }
+function stonePhoto(stone) {
+  if (!stone.img) return null;
+  let e = stoneImgs[stone.img];
+  if (!e) {
+    e = stoneImgs[stone.img] = { img: new Image(), ok: false };
+    e.img.onload = () => { e.ok = true; clearTimeout(stonePhoto.t); stonePhoto.t = setTimeout(() => stoneImgWatchers.forEach(f => f()), 30); };
+    e.img.src = stone.img;
+  }
+  return e.ok ? e.img : null;
+}
+function drawPhoto(ctx, x, y, w, h, img, r) {
+  const a = w / h, W = img.naturalWidth, H = img.naturalHeight;
+  let sh = H * (0.6 + 0.4 * r()), sw = sh * a;
+  if (sw > W) { sw = W * (0.6 + 0.4 * r()); sh = sw / a; }
+  if (sh > H) { sh = H; sw = sh * a; }
+  const sx = r() * (W - sw), sy = r() * (H - sh), fx = r() > .5 ? -1 : 1, fy = r() > .5 ? -1 : 1;
+  ctx.save(); ctx.translate(x + w / 2, y + h / 2); ctx.scale(fx, fy);
+  ctx.drawImage(img, sx, sy, sw, sh, -w / 2, -h / 2, w, h); ctx.restore();
+}
 function drawStone(ctx, x, y, w, h, stone, seed, finish = "polished") {
-  const r = rng(seed), kind = stone.kind || "vein", fin = String(finish).toLowerCase();
+  const r = rng(seed), kind = stone.kind || "vein", fin = String(finish).toLowerCase(), photo = stonePhoto(stone);
   ctx.save(); ctx.beginPath(); ctx.rect(x, y, w, h); ctx.clip();
-  if (kind === "mosaic") drawMosaic(ctx, x, y, w, h, stone, r);
+  if (photo) drawPhoto(ctx, x, y, w, h, photo, r);
+  else if (kind === "mosaic") drawMosaic(ctx, x, y, w, h, stone, r);
   else if (kind === "wood") drawWood(ctx, x, y, w, h, stone, r);
   else {
     const g = ctx.createLinearGradient(x, y, x + w, y + h);

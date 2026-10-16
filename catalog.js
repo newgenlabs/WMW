@@ -91,3 +91,6 @@ const CATALOG = [
 ];
 
 const stoneByIdAny = id => CATALOG.find(c => c.id === id);
+
+/* Real photographs for stones that have been shot on installed projects */
+[["carrara", "carrara", "emperador"], ["calacatta", "calacatta", "statuario"], ["statuario", "statuario", "carrara"], ["arabescato", "arabescato", "emperador"], ["emperador", "emperador", "carrara"], ["t-grey", "t-grey", "carrara"]].forEach(([id, f, pair]) => { const p = CATALOG.find(c => c.id === id); if (p) { p.img = `images/stones/${f}.jpg`; p.pair = pair; } });
