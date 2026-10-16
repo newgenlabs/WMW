@@ -383,12 +383,12 @@ dialog .btn{padding:13px 20px}
 :root{
   --bg:#ffffff; --tint:#f3f3f1; --ink:#0e0e0f; --muted:#68686b; --line:#e3e3e0;
   --accent:#5f6652; --accent-d:#454b3a;
-  --sans:"Plus Jakarta Sans",system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;
-  --serif:"Plus Jakarta Sans",system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;
+  --sans:"Inter",system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;
+  --serif:"Inter Tight","Inter",system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;
   --header-h:72px;
 }
-body{font-family:var(--sans);letter-spacing:-.005em}
-h1,h2,h3{font-weight:700;letter-spacing:-.035em;line-height:1.05}
+body{font-family:var(--sans);letter-spacing:-.003em}
+h1,h2,h3{font-family:"Inter Tight","Inter",system-ui,sans-serif;font-weight:600;letter-spacing:-.03em;line-height:1.05}
 h1{font-size:clamp(2.8rem,6vw,5rem)}
 h2{font-size:clamp(2rem,4vw,3.3rem)}
 h3{font-size:1.3rem;letter-spacing:-.02em}
@@ -555,7 +555,7 @@ dt{font:700 .68rem var(--sans);letter-spacing:.06em;color:var(--muted)}
 .page-collection #collection{padding-top:36px}
 
 /* ===== Home banner: editorial landing layout (stacked serif title, tour card, material note, stat, closing line) ===== */
-:root{--display:"Playfair Display",Georgia,"Times New Roman",serif;--brown:#3a2c24;--cocoa:#8d7562}
+:root{--display:"Cormorant Garamond",Georgia,"Times New Roman",serif;--brown:#3a2c24;--cocoa:#8d7562}
 .hero-home{position:relative;height:100vh;min-height:600px;overflow:hidden;background:#cfc9c6}
 .banner{position:absolute;inset:0;overflow:hidden;color:var(--brown);background:#cfc9c6}
 #bnBg{position:absolute;inset:0;width:100%;height:100%;touch-action:auto;cursor:default}
@@ -618,3 +618,10 @@ dt{font:700 .68rem var(--sans);letter-spacing:.06em;color:var(--muted)}
 .bn-main:hover .bn-chip{background:var(--brown);color:#fff}
 .bn-main img{transition:transform .8s}.bn-main:hover img{transform:scale(1.04)}
 .bn-start{display:inline-block;text-decoration:none}
+
+/* ===== Typography refinement: Inter Tight headings, Inter text, Cormorant Garamond for the heritage title ===== */
+.brand-name{font-family:"Inter Tight","Inter",sans-serif;font-weight:700;letter-spacing:-.035em}
+.bn-card h2,.bn-note b,.bn-cta p,.svc-txt b,.pc-meta h3,.sel-list b,summary,.step-tabs button{font-family:"Inter Tight","Inter",sans-serif}
+.bn-copy h1{font-weight:600;letter-spacing:0}
+.bn-copy h1 small{font-weight:600}
+.bn-stat strong{font-weight:500}
