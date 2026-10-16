@@ -1,0 +1,4 @@
+PRIVATE-KEY-KEEP-SECRET.json
+*.pem
+.env
+node_modules/

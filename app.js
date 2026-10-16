@@ -70,30 +70,53 @@ const VALID = {
   qEmail: v => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v) || "Enter a valid email",
   qZip: v => v.trim().length >= 3 || "Enter your ZIP or postcode"
 };
+const esc = s => String(s).replace(/[&<>"']/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
 function quoteForm() {
-  const form = $("#quoteForm");
+  const form = $("#quoteForm"), opened = Date.now();
   try { const pending = sessionStorage.getItem("wms-msg"); if (pending) { $("#qMsg").value = pending; sessionStorage.removeItem("wms-msg"); } } catch { /* ignore */ }
   const check = id => { const el = $("#" + id), r = VALID[id](el.value); el.classList.toggle("bad", r !== true); $(`.err[data-for=${id}]`).textContent = r === true ? "" : r; return r === true; };
   Object.keys(VALID).forEach(id => $("#" + id).addEventListener("blur", () => check(id)));
+  /* Personal details are never kept on the device. Only a minimal receipt (date and request type) is stored. */
   const drawSaved = () => {
     const list = store.get("wms-requests", []);
-    $("#savedList").innerHTML = list.length ? list.map((r, i) => `<li><span>${new Date(r.at).toLocaleDateString()} — ${r.name}, ${r.design}</span><button type="button" data-i="${i}" aria-label="Delete request">Remove</button></li>`).join("") : '<li class="muted">Nothing yet.</li>';
+    $("#savedList").innerHTML = list.length ? list.map((r, i) => `<li><span>${esc(new Date(r.at).toLocaleDateString())}: ${esc(r.design)}</span><button type="button" data-i="${i}" aria-label="Delete receipt">Remove</button></li>`).join("") : '<li class="muted">Nothing yet.</li>';
   };
   $("#savedList").addEventListener("click", e => {
     const b = e.target.closest("button"); if (!b) return;
     const list = store.get("wms-requests", []); list.splice(+b.dataset.i, 1); store.set("wms-requests", list); drawSaved();
   });
-  form.addEventListener("submit", e => {
+  const status = (txt, node) => { const s = $("#formStatus"); s.textContent = txt; if (node) s.append(" ", node); };
+  let busy = false, last = 0;
+  form.addEventListener("submit", async e => {
     e.preventDefault();
+    if (busy) return;
     const ok = Object.keys(VALID).map(check).every(Boolean);
     if (!ok) { $(".bad", form)?.focus(); return; }
+    if ($("#qWebsite").value || Date.now() - opened < 2500) { status("Something went wrong. Please try again."); return; } /* honeypot and too-fast bots */
+    if (Date.now() - last < 15000) { status("Please wait a moment before sending again."); return; }
+    busy = true; last = Date.now();
+    const cut = (v, n) => String(v).trim().slice(0, n);
     const sel = selectionsList();
-    const rec = { at: Date.now(), name: $("#qName").value.trim(), phone: $("#qPhone").value, email: $("#qEmail").value, zip: $("#qZip").value, when: $("#qWhen").value, msg: $("#qMsg").value, design: sel.length ? `${sel.length} saved selection${sel.length > 1 ? "s" : ""}` : "general enquiry" };
-    const list = store.get("wms-requests", []); list.unshift(rec); store.set("wms-requests", list.slice(0, 10)); drawSaved();
-    const body = `Name: ${rec.name}\nPhone: ${rec.phone}\nEmail: ${rec.email}\nZIP: ${rec.zip}\nStart: ${rec.when}\nSaved selections: ${sel.length ? sel.map(i => `${i.name} (${i.finish})`).join("; ") : "none"}\nPhotos to follow: ${$("#qPhotos").checked ? "yes" : "no"}\n\n${rec.msg}`;
-    const href = `mailto:${CONFIG.email}?subject=${encodeURIComponent("Quote request — " + rec.name)}&body=${encodeURIComponent(body)}`;
-    $("#formStatus").innerHTML = `Thanks, ${rec.name.split(" ")[0]} — request saved on this device. <a href="${href}" style="color:#d3b06a">Click here to email it to Whitestone</a> to send it.`;
-    form.reset(); toast("Request saved");
+    const payload = { sent: new Date().toISOString(), name: cut($("#qName").value, 120), phone: cut($("#qPhone").value, 40), email: cut($("#qEmail").value, 160), zip: cut($("#qZip").value, 20), start: $("#qWhen").value, selections: sel.map(i => `${i.name} (${i.finish})`), photosToFollow: $("#qPhotos").checked, message: cut($("#qMsg").value, 4000) };
+    try {
+      status("Encrypting and sending...");
+      const box = await E2E.encrypt(payload), text = JSON.stringify(box);
+      const first = payload.name.split(" ")[0];
+      const rec = { at: Date.now(), design: sel.length ? `${sel.length} saved selection${sel.length > 1 ? "s" : ""}` : "general enquiry" };
+      if (CONFIG.formEndpoint) {
+        const res = await fetch(CONFIG.formEndpoint, { method: "POST", headers: { "Content-Type": "application/json" }, body: text, referrerPolicy: "no-referrer", credentials: "omit" });
+        if (!res.ok) throw new Error("send failed");
+        status(`Thank you, ${first}. Your request was encrypted in your browser and sent securely.`);
+      } else {
+        const href = `mailto:${CONFIG.email}?subject=${encodeURIComponent("Encrypted quote request")}&body=${encodeURIComponent("This message is encrypted end to end. Only Whitestone can read it.\n\n" + text)}`;
+        const a = document.createElement("a"); a.href = href; a.textContent = "Open your email app to send it"; a.className = "mail-link";
+        status(`Thank you, ${first}. Your request is encrypted.`, a);
+      }
+      const list = store.get("wms-requests", []); list.unshift(rec); store.set("wms-requests", list.slice(0, 10)); drawSaved();
+      form.reset(); toast("Request encrypted");
+    } catch (err) {
+      status("Sorry, the request could not be sent. Please check your connection or call " + CONFIG.phone + ".");
+    } finally { busy = false; }
   });
   drawSaved();
 }

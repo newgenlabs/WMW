@@ -3,6 +3,10 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; img-src 'self' data: blob:; connect-src 'self' https:; object-src 'none'; base-uri 'self'; form-action 'self'; upgrade-insecure-requests">
+<meta name="referrer" content="strict-origin-when-cross-origin">
+<link rel="icon" href="favicon.svg" type="image/svg+xml">
+<meta name="theme-color" content="#3a2c24">
 <title>Whitestone Marble Setters</title>
 <meta name="description" content="Whitestone Marble Setters: marble, stone and tile installation for residential and commercial projects. Explore the work, preview layouts and request a quote.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -132,7 +136,8 @@
         <h3 class="saved-title">Your saved requests</h3>
         <ul class="saved" id="savedList"></ul>
       </div>
-      <form id="quoteForm" class="quote-form" novalidate>
+      <form id="quoteForm" class="quote-form" novalidate autocomplete="on">
+        <div class="hp" aria-hidden="true"><label>Website <input id="qWebsite" name="website" tabindex="-1" autocomplete="off"></label></div>
         <label>Full name <input id="qName" name="name" autocomplete="name" required><span class="err" data-for="qName"></span></label>
         <div class="grid2">
           <label>Phone <input id="qPhone" name="phone" type="tel" autocomplete="tel" required><span class="err" data-for="qPhone"></span></label>
@@ -146,7 +151,8 @@
         </div>
         <label>Project details <textarea id="qMsg" rows="4" placeholder="Rooms, access, timeline, anything worth knowing"></textarea></label>
         <label class="inline"><input type="checkbox" id="qPhotos"> I will send photos by email after submitting</label>
-        <button class="btn" type="submit">Send request</button>
+        <button class="btn" type="submit">Send encrypted request</button>
+        <p class="fine lock">Your details are encrypted in your browser before they are sent. <a href="privacy.html">Privacy</a></p>
         <p class="fine" id="formStatus" role="status"></p>
       </form>
     </div>
@@ -159,11 +165,12 @@
     <div><p class="foot-h">Contact</p><p><span id="ftPhone"></span><br><span id="ftEmail"></span></p></div>
     <div><p class="foot-h">Explore</p><p><a href="gallery.html">Gallery</a><br><a href="collection.html">Collection</a><br><a href="#services">Services</a><br><a href="#quote">Request a quote</a></p></div>
   </div>
-  <p class="copy">&copy; <span id="yr"></span> Whitestone Marble Setters</p>
+  <p class="copy"><a href="privacy.html">Privacy and security</a> &middot; &copy; <span id="yr"></span> Whitestone Marble Setters</p>
 </footer>
 
 <div class="toast" id="toast" role="status" aria-live="polite"></div>
 <script src="config.js"></script>
+<script src="crypto.js"></script>
 <script src="catalog.js"></script>
 <script src="core.js"></script>
 <script src="app.js"></script>

@@ -625,3 +625,13 @@ dt{font:700 .68rem var(--sans);letter-spacing:.06em;color:var(--muted)}
 .bn-copy h1{font-weight:600;letter-spacing:0}
 .bn-copy h1 small{font-weight:600}
 .bn-stat strong{font-weight:500}
+
+.hp{position:absolute;left:-9999px;width:1px;height:1px;overflow:hidden}
+.lock{margin:12px 0 0}.lock a{text-decoration:underline}
+.mail-link{color:#d8dfc7;font-weight:600;text-decoration:underline}
+.copy a{color:inherit;text-decoration:underline}
+.page-doc .doc{padding:calc(var(--header-h) + 60px) 0 100px}
+.narrow-doc{max-width:760px}
+.narrow-doc h1{font-size:clamp(2.2rem,5vw,3.4rem);margin-bottom:.6em}
+.narrow-doc h2{font-size:1.4rem;margin:1.8em 0 .4em}
+.narrow-doc p{color:var(--muted);margin:0 0 1em}

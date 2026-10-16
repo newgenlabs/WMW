@@ -3,6 +3,10 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; img-src 'self' data: blob:; connect-src 'self' https:; object-src 'none'; base-uri 'self'; form-action 'self'; upgrade-insecure-requests">
+<meta name="referrer" content="strict-origin-when-cross-origin">
+<link rel="icon" href="favicon.svg" type="image/svg+xml">
+<meta name="theme-color" content="#3a2c24">
 <title>Collection | Whitestone Marble Setters</title>
 <meta name="description" content="Browse marble, quartzite, limestone, travertine, granite, porcelain, ceramic and mosaic tile by material, colour, finish and application.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -68,7 +72,7 @@
     <div><p class="foot-h">Contact</p><p><span id="ftPhone"></span><br><span id="ftEmail"></span></p></div>
     <div><p class="foot-h">Explore</p><p><a href="gallery.html">Gallery</a><br><a href="collection.html">Collection</a><br><a href="index.html#services">Services</a><br><a href="index.html#quote">Request a quote</a></p></div>
   </div>
-  <p class="copy">&copy; <span id="yr"></span> Whitestone Marble Setters</p>
+  <p class="copy"><a href="privacy.html">Privacy and security</a> &middot; &copy; <span id="yr"></span> Whitestone Marble Setters</p>
 </footer>
 
 <div class="toast" id="toast" role="status" aria-live="polite"></div>
@@ -76,9 +80,6 @@
 <script src="catalog.js"></script>
 <script src="core.js"></script>
 <script src="collection.js"></script>
-<script>
-  document.getElementById("ftPhone").textContent = CONFIG.phone; document.getElementById("ftEmail").textContent = CONFIG.email; document.getElementById("yr").textContent = new Date().getFullYear();
-  (function () { const t = document.querySelector(".nav-toggle"), n = document.getElementById("nav"); t.addEventListener("click", () => { const o = n.classList.toggle("open"); t.setAttribute("aria-expanded", o); }); })();
-</script>
+<script src="nav.js"></script>
 </body>
 </html>
