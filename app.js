@@ -1,5 +1,5 @@
 "use strict";
-/* Home page behaviour: services, layout visualizer, process, FAQ, quote form. */
+/* Home page behaviour: services, process, FAQ, quote form. */
 /* ---------- services ---------- */
 const SERVICES = [
   { t: "Floors", d: "Entries, kitchens, lobbies and living areas: flat, flush and lippage-free.", img: 12 },
@@ -16,60 +16,6 @@ function services() {
     const b = e.target.closest("button[data-i]"); if (!b) return;
     goToQuote(`I'm interested in: ${SERVICES[b.dataset.i].t}.`);
   });
-}
-
-/* ---------- visualizer ---------- */
-function radio(container, items, current, render, onPick) {
-  container.innerHTML = "";
-  items.forEach(it => {
-    const b = document.createElement("button");
-    b.type = "button"; b.setAttribute("role", "radio"); b.dataset.id = it.id;
-    render(b, it);
-    b.addEventListener("click", () => { onPick(it.id); sync(); });
-    container.append(b);
-  });
-  const sync = () => $$("button", container).forEach(b => b.setAttribute("aria-checked", b.dataset.id === current()));
-  sync();
-  container.addEventListener("keydown", e => {
-    if (!["ArrowRight", "ArrowLeft", "ArrowDown", "ArrowUp"].includes(e.key)) return;
-    e.preventDefault();
-    const ids = items.map(i => i.id), d = /Right|Down/.test(e.key) ? 1 : -1;
-    const n = ids[(ids.indexOf(current()) + d + ids.length) % ids.length];
-    onPick(n); sync(); $(`[data-id="${CSS.escape(n)}"]`, container).focus();
-  });
-  return sync;
-}
-
-function visualizer() {
-  const canvas = $("#vizCanvas"), ctx = canvas.getContext("2d");
-  const render = () => {
-    const stone = stoneById(state.stone), ppi = canvas.width / 144; // room is 12ft wide
-    layFloor(ctx, canvas.width, canvas.height, { stone, pattern: state.pattern, tileIn: state.size, ppi, grout: state.grout, finish: state.finish, seed: state.seedBase * 1000 });
-    $("#stoneNote").textContent = stone.note;
-    $("#sizeOut").textContent = state.size + '"';
-    const p = PATTERNS.find(p => p.id === state.pattern);
-    $("#vizCaption").textContent = `${stone.name}, ${p.name.toLowerCase()} layout, ${state.size}" tiles, ${state.finish} finish — shown on a 12′ × 8′ room.`;
-    renderSummary();
-  };
-  const syncs = [];
-  const R = (...a) => syncs.push(radio(...a));
-  R($("#stoneSwatches"), STONES, () => state.stone, (b, s) => {
-    const c = document.createElement("canvas"); c.width = 90; c.height = 56;
-    const paint = () => drawStone(c.getContext("2d"), 0, 0, 90, 56, s, 3 + s.name.length); paint(); onStoneImages(paint);
-    b.append(c, s.name); b.setAttribute("aria-label", s.name);
-  }, id => { state.stone = id; render(); });
-  R($("#patternSeg"), PATTERNS, () => state.pattern, (b, p) => b.textContent = p.name, id => { state.pattern = id; render(); });
-  R($("#groutSeg"), GROUTS, () => state.grout, (b, g) => b.innerHTML = `<span style="display:inline-block;width:10px;height:10px;border-radius:50%;background:${g.id};border:1px solid #0003;margin-right:6px"></span>${g.name}`, id => { state.grout = id; render(); });
-  R($("#finishSeg"), FINISHES, () => state.finish, (b, f) => b.textContent = f.name, id => { state.finish = id; render(); });
-  $("#tileSize").addEventListener("input", e => { state.size = +e.target.value; render(); });
-  $("#shuffleBtn").addEventListener("click", () => { state.seedBase = (state.seedBase * 31 + 17) % 9973; render(); });
-  $("#useInEstimate").addEventListener("click", () => {
-    const st = stoneById(state.stone), p = PATTERNS.find(p => p.id === state.pattern);
-    goToQuote(`I'd like a quote for this layout: ${st.name}, ${p.name.toLowerCase()} layout, ${state.size}" tiles, ${state.finish} finish.`);
-  });
-  onStoneImages(render);
-  visualizer.refresh = () => { syncs.forEach(f => f()); render(); };
-  render();
 }
 
 /* ---------- process / testimonials / faq ---------- */
@@ -115,9 +61,8 @@ function faq() {
 /* ---------- quote form ---------- */
 function renderSummary() {
   const el = $("#quoteSummary"); if (!el) return;
-  const s = stoneById(state.stone), p = PATTERNS.find(p => p.id === state.pattern), sel = selectionsList();
-  el.innerHTML = `<div><span>Layout preview</span><span>${s.name} · ${p.name} · ${state.finish}</span></div>` +
-    `<div><span>Saved selections</span><span>${sel.length ? sel.map(i => i.name).join(", ") : "None yet"}</span></div>`;
+  const sel = selectionsList();
+  el.innerHTML = `<div><span>Saved selections</span><span>${sel.length ? sel.map(i => i.name).join(", ") : "None yet"}</span></div>`;
 }
 const VALID = {
   qName: v => v.trim().length >= 2 || "Please enter your name",
@@ -142,10 +87,10 @@ function quoteForm() {
     e.preventDefault();
     const ok = Object.keys(VALID).map(check).every(Boolean);
     if (!ok) { $(".bad", form)?.focus(); return; }
-    const s = stoneById(state.stone), sel = selectionsList();
-    const rec = { at: Date.now(), name: $("#qName").value.trim(), phone: $("#qPhone").value, email: $("#qEmail").value, zip: $("#qZip").value, when: $("#qWhen").value, msg: $("#qMsg").value, design: sel.length ? `${sel.length} saved selection${sel.length > 1 ? "s" : ""}` : `${s.name} ${state.pattern}` };
+    const sel = selectionsList();
+    const rec = { at: Date.now(), name: $("#qName").value.trim(), phone: $("#qPhone").value, email: $("#qEmail").value, zip: $("#qZip").value, when: $("#qWhen").value, msg: $("#qMsg").value, design: sel.length ? `${sel.length} saved selection${sel.length > 1 ? "s" : ""}` : "general enquiry" };
     const list = store.get("wms-requests", []); list.unshift(rec); store.set("wms-requests", list.slice(0, 10)); drawSaved();
-    const body = `Name: ${rec.name}\nPhone: ${rec.phone}\nEmail: ${rec.email}\nZIP: ${rec.zip}\nStart: ${rec.when}\nDesign: ${s.name}, ${state.pattern}, ${state.size}" tiles, ${state.finish}, grout ${state.grout}\nSaved selections: ${sel.length ? sel.map(i => `${i.name} (${i.finish})`).join("; ") : "none"}\nPhotos to follow: ${$("#qPhotos").checked ? "yes" : "no"}\n\n${rec.msg}`;
+    const body = `Name: ${rec.name}\nPhone: ${rec.phone}\nEmail: ${rec.email}\nZIP: ${rec.zip}\nStart: ${rec.when}\nSaved selections: ${sel.length ? sel.map(i => `${i.name} (${i.finish})`).join("; ") : "none"}\nPhotos to follow: ${$("#qPhotos").checked ? "yes" : "no"}\n\n${rec.msg}`;
     const href = `mailto:${CONFIG.email}?subject=${encodeURIComponent("Quote request — " + rec.name)}&body=${encodeURIComponent(body)}`;
     $("#formStatus").innerHTML = `Thanks, ${rec.name.split(" ")[0]} — request saved on this device. <a href="${href}" style="color:#d3b06a">Click here to email it to Whitestone</a> to send it.`;
     form.reset(); toast("Request saved");
@@ -163,4 +108,4 @@ function page() {
   $$(".section .wrap > *, .reveal").forEach(el => { el.classList.add("reveal"); io.observe(el); });
 }
 
-services(); visualizer(); process(); faq(); quoteForm(); page();
+services(); process(); faq(); quoteForm(); page();

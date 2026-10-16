@@ -19,10 +19,7 @@ function toast(msg) {
 }
 
 /* ---------- data ---------- */
-/* The visualizer uses stones that have real photographs (see catalog.js). */
-const STONE_IDS = ["carrara", "calacatta", "statuario", "arabescato", "emperador", "t-grey"];
-const STONES = STONE_IDS.map(id => stoneByIdAny(id));
-const stoneById = id => STONES.find(s => s.id === id) || stoneByIdAny(id);
+const stoneById = id => stoneByIdAny(id);
 
 const PATTERNS = [
   { id: "straight",   name: "Straight",   labor: 14, waste: 0.08 },
@@ -32,9 +29,7 @@ const PATTERNS = [
   { id: "herringbone",name: "Herringbone",labor: 22, waste: 0.15 }
 ];
 const GROUTS = [{ id: "#d8d4cc", name: "Light" }, { id: "#9c978d", name: "Grey" }, { id: "#3b3a38", name: "Charcoal" }, { id: "#c4b08a", name: "Sand" }];
-const FINISHES = [{ id: "polished", name: "Polished" }, { id: "honed", name: "Honed" }, { id: "tumbled", name: "Tumbled" }];
 
-const state = { stone: "carrara", pattern: "straight", size: 12, grout: GROUTS[0].id, finish: "polished", seedBase: 7 };
 
 /* ---------- procedural marble ---------- */
 function rng(seed) { // mulberry32

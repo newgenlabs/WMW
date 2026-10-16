@@ -22,7 +22,6 @@
     <a href="gallery.html">Gallery</a>
     <a href="collection.html">Collection</a>
     <a href="#services">Services</a>
-    <a href="#visualizer">Visualizer</a>
     <a href="#process">Process</a>
     <a href="#faq">FAQ</a>
     <a href="#quote" class="nav-cta">Request a Quote</a>
@@ -94,51 +93,6 @@
         <p class="sub">Select a service to start a quote request.</p>
       </div>
       <ol class="service-list" id="serviceList"></ol>
-    </div>
-  </section>
-
-  <section id="visualizer" class="section">
-    <div class="wrap">
-      <div class="section-head">
-        <div>
-          <p class="eyebrow">Layout visualizer</p>
-          <h2>Explore stones and patterns</h2>
-        </div>
-        <p class="sub">An illustration to help you compare layouts. Natural veining varies from slab to slab.</p>
-      </div>
-      <div class="viz">
-        <div class="viz-controls">
-          <fieldset>
-            <legend>Stone</legend>
-            <div class="swatches" id="stoneSwatches" role="radiogroup" aria-label="Stone"></div>
-            <p class="stone-note" id="stoneNote"></p>
-          </fieldset>
-          <fieldset>
-            <legend>Layout</legend>
-            <div class="seg" id="patternSeg" role="radiogroup" aria-label="Layout"></div>
-          </fieldset>
-          <fieldset>
-            <legend>Tile size <output id="sizeOut">12"</output></legend>
-            <input type="range" id="tileSize" min="8" max="24" step="2" value="12" aria-label="Tile size in inches">
-          </fieldset>
-          <fieldset>
-            <legend>Grout</legend>
-            <div class="seg" id="groutSeg" role="radiogroup" aria-label="Grout colour"></div>
-          </fieldset>
-          <fieldset>
-            <legend>Finish</legend>
-            <div class="seg" id="finishSeg" role="radiogroup" aria-label="Finish"></div>
-          </fieldset>
-          <div class="viz-actions">
-            <button class="btn btn-ghost" id="shuffleBtn" type="button">Shuffle veining</button>
-            <button class="btn" id="useInEstimate" type="button">Request this layout</button>
-          </div>
-        </div>
-        <div class="viz-stage">
-          <canvas id="vizCanvas" width="900" height="600" role="img" aria-label="Floor pattern preview"></canvas>
-          <p class="viz-caption" id="vizCaption"></p>
-        </div>
-      </div>
     </div>
   </section>
 
